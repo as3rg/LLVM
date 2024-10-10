@@ -9,7 +9,9 @@ get-app:
 
 opt: build get-app
 	cd build && \
-	clang code/app/*.c code/float32/*.c -fpass-plugin=./customPass.so -lSDL2 -O3
+	clang code/app/*.c -O3 -S -emit-llvm && \
+	clang code/app/app.c code/float32/*.c -fpass-plugin=./customPass.so -O3 -S -emit-llvm && \
+	clang *.ll -lSDL2
 
 run: opt
 	cd build && \

@@ -9,29 +9,18 @@
 
 using namespace llvm;
 
-bool is_allowed(Module& M, Function& F) {
-  std::string sourceName = M.getSourceFileName();
-  if (sourceName != "code/app/app.c" && sourceName != "code/float32/float32.c" && sourceName != "code/float32/float32_math.c") 
-    return false;
-  std::string funcName = F.getName().str();
-  return true && !F.isDeclaration();
-}
-
 struct CustomPass : public PassInfoMixin<CustomPass> {
   PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM) {
     LLVMContext &Ctx = M.getContext();
     IRBuilder<> builder(Ctx);
 
-    ArrayRef<Type *> printParamTypes = {Type::getInt8Ty(Ctx)};
-    FunctionCallee printFunc = M.getOrInsertFunction("puts", Type::getInt32Ty(Ctx), PointerType::get(Type::getInt8Ty(Ctx), 0));
+    FunctionCallee printFunc = M.getOrInsertFunction("puts", Type::getInt32Ty(Ctx), Type::getInt8Ty(Ctx)->getPointerTo());
 
     for (auto &F : M) {
-      if (!is_allowed(M, F)) 
-        continue;
-
+      if (F.isDeclaration()) continue;
       for (auto &B : F) {
         for (auto &I : B) {
-          if (dyn_cast<PHINode>(&I)) continue;
+          if (isa<PHINode>(&I)) continue;
           builder.SetInsertPoint(&I);
           for (auto &O : I.operands()) {
             if (auto *O2 = dyn_cast<Instruction>(O)) {
@@ -44,6 +33,8 @@ struct CustomPass : public PassInfoMixin<CustomPass> {
     }
     return PreservedAnalyses::none();
   };
+  
+  static bool isRequired() { return true; }
 };
 
 PassPluginLibraryInfo getPassPluginInfo() {
