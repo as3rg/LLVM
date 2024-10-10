@@ -1,5 +1,4 @@
 #include "float32.h"
-#include "assert.h"
 
 #define uint unsigned int
 #define ll long long 
@@ -69,7 +68,6 @@ static F32_FLOAT_T build_float(char s, int exp, ull mantissa, char carry, int on
     } else if (mantissa >= (1 << F32_T_SIZE)) {
         return set_s(set_e(set_t(0, mantissa), exp + F32_BIAS), s);
     } else {
-        assert(exp == F32_EMIN);
         return set_s(set_e(set_t(0, mantissa), 0), s);
     }
 }

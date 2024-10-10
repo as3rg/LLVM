@@ -6,7 +6,8 @@ build:
 llvm:
 	mkdir llvm
 	cd llvm && \
-	clang ../app/*.c ../app/*.h ../float32/*.c ../float32/*.h -S -emit-llvm
+	clang ../app/app.c ../float32/*.c ../float32/*.h -S -emit-llvm && \
+	llvm-link -S -v -o result.ll *.ll
 
 run: build
 	./build/a.out

@@ -3,12 +3,6 @@ source_filename = "../app/app.c"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-unknown-linux-gnu"
 
-@__const.app.SPHERE_X = private unnamed_addr constant [3 x i32] [i32 -1041235968, i32 1106247680, i32 0], align 4
-@__const.app.SPHERE_Y = private unnamed_addr constant [3 x i32] [i32 0, i32 0, i32 1103626240], align 4
-@__const.app.SPHERE_Z = private unnamed_addr constant [3 x i32] [i32 1106247680, i32 1106247680, i32 1106247680], align 4
-@__const.app.SPHERE_R = private unnamed_addr constant [3 x i32] [i32 1101004800, i32 1101004800, i32 1101004800], align 4
-@__const.app.SPHERE_COLOR = private unnamed_addr constant [3 x i32] [i32 16711680, i32 16776960, i32 65280], align 4
-
 ; Function Attrs: nounwind sspstrong uwtable
 define i32 @sqr(i32 noundef %0) local_unnamed_addr #0 {
   %2 = tail call i32 @f32_mul(i32 noundef %0, i32 noundef %0) #4
@@ -346,67 +340,141 @@ define i32 @ray(ptr nocapture noundef readonly %0, ptr nocapture noundef readonl
 }
 
 ; Function Attrs: nounwind sspstrong uwtable
+define void @init(ptr nocapture noundef writeonly %0, ptr nocapture noundef writeonly %1, ptr nocapture noundef writeonly %2, ptr nocapture noundef writeonly %3, ptr nocapture noundef writeonly %4, ptr nocapture noundef writeonly %5) local_unnamed_addr #0 {
+  store i32 -1041235968, ptr %0, align 4, !tbaa !5
+  %7 = getelementptr i32, ptr %0, i64 1
+  store i32 1106247680, ptr %7, align 4, !tbaa !5
+  %8 = getelementptr i32, ptr %0, i64 2
+  store i32 0, ptr %8, align 4, !tbaa !5
+  store i32 0, ptr %1, align 4, !tbaa !5
+  %9 = getelementptr i32, ptr %1, i64 1
+  store i32 0, ptr %9, align 4, !tbaa !5
+  %10 = getelementptr i32, ptr %1, i64 2
+  store i32 1103626240, ptr %10, align 4, !tbaa !5
+  %11 = getelementptr i32, ptr %2, i64 2
+  store i32 1106247680, ptr %11, align 4, !tbaa !5
+  %12 = getelementptr i32, ptr %2, i64 1
+  store i32 1106247680, ptr %12, align 4, !tbaa !5
+  store i32 1106247680, ptr %2, align 4, !tbaa !5
+  %13 = getelementptr i32, ptr %3, i64 2
+  store i32 1101004800, ptr %13, align 4, !tbaa !5
+  %14 = getelementptr i32, ptr %3, i64 1
+  store i32 1101004800, ptr %14, align 4, !tbaa !5
+  store i32 1101004800, ptr %3, align 4, !tbaa !5
+  %15 = tail call i32 @f32_div(i32 noundef 1077936128, i32 noundef 1082130432) #4
+  %16 = getelementptr i32, ptr %4, i64 2
+  store i32 %15, ptr %16, align 4, !tbaa !5
+  %17 = getelementptr i32, ptr %4, i64 1
+  store i32 %15, ptr %17, align 4, !tbaa !5
+  store i32 %15, ptr %4, align 4, !tbaa !5
+  store i32 16711680, ptr %5, align 4, !tbaa !5
+  %18 = getelementptr i32, ptr %5, i64 1
+  store i32 16776960, ptr %18, align 4, !tbaa !5
+  %19 = getelementptr i32, ptr %5, i64 2
+  store i32 65280, ptr %19, align 4, !tbaa !5
+  ret void
+}
+
+; Function Attrs: nounwind sspstrong uwtable
 define void @app() local_unnamed_addr #0 {
   %1 = alloca [3 x i32], align 4
-  %2 = alloca [500 x [500 x i32]], align 16
+  %2 = alloca [3 x i32], align 4
+  %3 = alloca [3 x i32], align 4
+  %4 = alloca [3 x i32], align 4
+  %5 = alloca [3 x i32], align 4
+  %6 = alloca [3 x i32], align 4
+  %7 = alloca [500 x [500 x i32]], align 16
   call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %1) #4
-  %3 = tail call i32 @f32_div(i32 noundef 1077936128, i32 noundef 1082130432) #4
-  store i32 %3, ptr %1, align 4, !tbaa !5
-  %4 = getelementptr inbounds i32, ptr %1, i64 1
-  %5 = tail call i32 @f32_div(i32 noundef 1077936128, i32 noundef 1082130432) #4
-  store i32 %5, ptr %4, align 4, !tbaa !5
-  %6 = getelementptr inbounds i32, ptr %1, i64 2
-  %7 = tail call i32 @f32_div(i32 noundef 1077936128, i32 noundef 1082130432) #4
-  store i32 %7, ptr %6, align 4, !tbaa !5
-  call void @llvm.lifetime.start.p0(i64 1000000, ptr nonnull %2) #4
-  call void @llvm.memset.p0.i64(ptr noundef nonnull align 16 dereferenceable(1000000) %2, i8 0, i64 1000000, i1 false), !tbaa !5
-  br label %8
+  call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %2) #4
+  call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %3) #4
+  call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %4) #4
+  call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %5) #4
+  call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %6) #4
+  store i32 -1041235968, ptr %1, align 4, !tbaa !5
+  %8 = getelementptr inbounds i32, ptr %1, i64 1
+  store i32 1106247680, ptr %8, align 4, !tbaa !5
+  %9 = getelementptr inbounds i32, ptr %1, i64 2
+  store i32 0, ptr %9, align 4, !tbaa !5
+  store i32 0, ptr %2, align 4, !tbaa !5
+  %10 = getelementptr inbounds i32, ptr %2, i64 1
+  store i32 0, ptr %10, align 4, !tbaa !5
+  %11 = getelementptr inbounds i32, ptr %2, i64 2
+  store i32 1103626240, ptr %11, align 4, !tbaa !5
+  %12 = getelementptr inbounds i32, ptr %3, i64 2
+  store i32 1106247680, ptr %12, align 4, !tbaa !5
+  %13 = getelementptr inbounds i32, ptr %3, i64 1
+  store i32 1106247680, ptr %13, align 4, !tbaa !5
+  store i32 1106247680, ptr %3, align 4, !tbaa !5
+  %14 = getelementptr inbounds i32, ptr %4, i64 2
+  store i32 1101004800, ptr %14, align 4, !tbaa !5
+  %15 = getelementptr inbounds i32, ptr %4, i64 1
+  store i32 1101004800, ptr %15, align 4, !tbaa !5
+  store i32 1101004800, ptr %4, align 4, !tbaa !5
+  %16 = tail call i32 @f32_div(i32 noundef 1077936128, i32 noundef 1082130432) #4
+  %17 = getelementptr inbounds i32, ptr %5, i64 2
+  store i32 %16, ptr %17, align 4, !tbaa !5
+  %18 = getelementptr inbounds i32, ptr %5, i64 1
+  store i32 %16, ptr %18, align 4, !tbaa !5
+  store i32 %16, ptr %5, align 4, !tbaa !5
+  store i32 16711680, ptr %6, align 4, !tbaa !5
+  %19 = getelementptr inbounds i32, ptr %6, i64 1
+  store i32 16776960, ptr %19, align 4, !tbaa !5
+  %20 = getelementptr inbounds i32, ptr %6, i64 2
+  store i32 65280, ptr %20, align 4, !tbaa !5
+  call void @llvm.lifetime.start.p0(i64 1000000, ptr nonnull %7) #4
+  call void @llvm.memset.p0.i64(ptr noundef nonnull align 16 dereferenceable(1000000) %7, i8 0, i64 1000000, i1 false), !tbaa !5
+  br label %21
 
-8:                                                ; preds = %0, %22
-  %9 = phi i64 [ 0, %0 ], [ %23, %22 ]
-  %10 = trunc i64 %9 to i32
-  br label %12
+21:                                               ; preds = %0, %35
+  %22 = phi i64 [ 0, %0 ], [ %36, %35 ]
+  %23 = trunc i64 %22 to i32
+  br label %25
 
-11:                                               ; preds = %22
-  call void @llvm.lifetime.end.p0(i64 1000000, ptr nonnull %2) #4
+24:                                               ; preds = %35
+  call void @llvm.lifetime.end.p0(i64 1000000, ptr nonnull %7) #4
+  call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %6) #4
+  call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %5) #4
+  call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %4) #4
+  call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %3) #4
+  call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %2) #4
   call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %1) #4
   ret void
 
-12:                                               ; preds = %8, %12
-  %13 = phi i64 [ 0, %8 ], [ %17, %12 ]
-  %14 = trunc i64 %13 to i32
-  %15 = call i32 @ray(ptr noundef nonnull @__const.app.SPHERE_X, ptr noundef nonnull @__const.app.SPHERE_Y, ptr noundef nonnull @__const.app.SPHERE_Z, ptr noundef nonnull @__const.app.SPHERE_R, ptr noundef nonnull %1, ptr noundef nonnull @__const.app.SPHERE_COLOR, i32 noundef %10, i32 noundef %14)
-  %16 = getelementptr [500 x [500 x i32]], ptr %2, i64 0, i64 %9, i64 %13
-  store i32 %15, ptr %16, align 4, !tbaa !5
-  %17 = add nuw nsw i64 %13, 1
-  %18 = icmp eq i64 %17, 500
-  br i1 %18, label %19, label %12, !llvm.loop !11
+25:                                               ; preds = %21, %25
+  %26 = phi i64 [ 0, %21 ], [ %30, %25 ]
+  %27 = trunc i64 %26 to i32
+  %28 = call i32 @ray(ptr noundef nonnull %1, ptr noundef nonnull %2, ptr noundef nonnull %3, ptr noundef nonnull %4, ptr noundef nonnull %5, ptr noundef nonnull %6, i32 noundef %23, i32 noundef %27)
+  %29 = getelementptr [500 x [500 x i32]], ptr %7, i64 0, i64 %22, i64 %26
+  store i32 %28, ptr %29, align 4, !tbaa !5
+  %30 = add nuw nsw i64 %26, 1
+  %31 = icmp eq i64 %30, 500
+  br i1 %31, label %32, label %25, !llvm.loop !11
 
-19:                                               ; preds = %12, %25
-  %20 = phi i64 [ %26, %25 ], [ 0, %12 ]
-  %21 = trunc i64 %20 to i32
-  br label %28
+32:                                               ; preds = %25, %38
+  %33 = phi i64 [ %39, %38 ], [ 0, %25 ]
+  %34 = trunc i64 %33 to i32
+  br label %41
 
-22:                                               ; preds = %25
+35:                                               ; preds = %38
   tail call void (...) @simFlush() #4
-  %23 = add nuw nsw i64 %9, 1
-  %24 = icmp eq i64 %23, 500
-  br i1 %24, label %11, label %8, !llvm.loop !12
+  %36 = add nuw nsw i64 %22, 1
+  %37 = icmp eq i64 %36, 500
+  br i1 %37, label %24, label %21, !llvm.loop !12
 
-25:                                               ; preds = %28
-  %26 = add nuw nsw i64 %20, 1
-  %27 = icmp eq i64 %26, 500
-  br i1 %27, label %22, label %19, !llvm.loop !13
+38:                                               ; preds = %41
+  %39 = add nuw nsw i64 %33, 1
+  %40 = icmp eq i64 %39, 500
+  br i1 %40, label %35, label %32, !llvm.loop !13
 
-28:                                               ; preds = %19, %28
-  %29 = phi i64 [ 0, %19 ], [ %33, %28 ]
-  %30 = getelementptr [500 x [500 x i32]], ptr %2, i64 0, i64 %20, i64 %29
-  %31 = load i32, ptr %30, align 4, !tbaa !5
-  %32 = trunc i64 %29 to i32
-  tail call void @simPutPixel(i32 noundef %21, i32 noundef %32, i32 noundef %31) #4
-  %33 = add nuw nsw i64 %29, 1
-  %34 = icmp eq i64 %33, 500
-  br i1 %34, label %25, label %28, !llvm.loop !14
+41:                                               ; preds = %32, %41
+  %42 = phi i64 [ 0, %32 ], [ %46, %41 ]
+  %43 = getelementptr [500 x [500 x i32]], ptr %7, i64 0, i64 %33, i64 %42
+  %44 = load i32, ptr %43, align 4, !tbaa !5
+  %45 = trunc i64 %42 to i32
+  tail call void @simPutPixel(i32 noundef %34, i32 noundef %45, i32 noundef %44) #4
+  %46 = add nuw nsw i64 %42, 1
+  %47 = icmp eq i64 %46, 500
+  br i1 %47, label %38, label %41, !llvm.loop !14
 }
 
 declare void @simPutPixel(i32 noundef, i32 noundef, i32 noundef) local_unnamed_addr #1

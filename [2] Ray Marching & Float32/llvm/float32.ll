@@ -3,11 +3,7 @@ source_filename = "../float32/float32.c"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-unknown-linux-gnu"
 
-@.str = private unnamed_addr constant [16 x i8] c"exp == F32_EMIN\00", align 1
-@.str.1 = private unnamed_addr constant [21 x i8] c"../float32/float32.c\00", align 1
-@__PRETTY_FUNCTION__.build_float = private unnamed_addr constant [67 x i8] c"unsigned int build_float(char, int, unsigned long long, char, int)\00", align 1
-
-; Function Attrs: nounwind sspstrong uwtable
+; Function Attrs: nofree norecurse nosync nounwind sspstrong memory(none) uwtable
 define i32 @f32_add(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = and i32 %0, 2139095040
   %4 = icmp ne i32 %3, 2139095040
@@ -252,7 +248,7 @@ define noundef signext i8 @f32_less(i32 noundef %0, i32 noundef %1) local_unname
   ret i8 %42
 }
 
-; Function Attrs: nounwind sspstrong uwtable
+; Function Attrs: nofree norecurse nosync nounwind sspstrong memory(none) uwtable
 define internal fastcc i32 @build_float(i8 noundef signext %0, i32 noundef %1, i64 noundef %2, i8 noundef signext %3, i32 noundef %4) unnamed_addr #0 {
   %6 = icmp ugt i64 %2, 16777215
   %7 = icmp slt i32 %1, -126
@@ -296,49 +292,40 @@ define internal fastcc i32 @build_float(i8 noundef signext %0, i32 noundef %1, i
   %37 = icmp ugt i64 %36, 16777215
   %38 = zext i1 %37 to i32
   %39 = add i32 %23, %38
-  %40 = select i1 %37, i64 8388608, i64 %36
-  %41 = icmp sgt i32 %39, 127
-  br i1 %41, label %42, label %45
+  %40 = icmp sgt i32 %39, 127
+  br i1 %40, label %41, label %44
 
-42:                                               ; preds = %35
-  %43 = zext nneg i8 %0 to i32
-  %44 = shl i32 %43, 31
-  br label %63
+41:                                               ; preds = %35
+  %42 = zext nneg i8 %0 to i32
+  %43 = shl i32 %42, 31
+  br label %59
 
-45:                                               ; preds = %35
-  %46 = icmp ugt i64 %40, 8388607
-  br i1 %46, label %47, label %56
+44:                                               ; preds = %35
+  %45 = select i1 %37, i64 8388608, i64 %36
+  %46 = icmp ugt i64 %45, 8388607
+  %47 = trunc i64 %45 to i32
+  br i1 %46, label %48, label %56
 
-47:                                               ; preds = %45
-  %48 = trunc i64 %40 to i32
-  %49 = and i32 %48, 8388607
+48:                                               ; preds = %44
+  %49 = and i32 %47, 8388607
   %50 = shl i32 %39, 23
   %51 = add i32 %50, 1065353216
   %52 = and i32 %51, 2139095040
   %53 = or disjoint i32 %49, %52
   %54 = zext nneg i8 %0 to i32
   %55 = shl i32 %54, 31
-  br label %63
+  br label %59
 
-56:                                               ; preds = %45
-  %57 = icmp eq i32 %39, -126
-  br i1 %57, label %59, label %58
+56:                                               ; preds = %44
+  %57 = zext nneg i8 %0 to i32
+  %58 = shl i32 %57, 31
+  br label %59
 
-58:                                               ; preds = %56
-  tail call void @__assert_fail(ptr noundef nonnull @.str, ptr noundef nonnull @.str.1, i32 noundef 72, ptr noundef nonnull @__PRETTY_FUNCTION__.build_float) #4
-  unreachable
-
-59:                                               ; preds = %56
-  %60 = trunc i64 %40 to i32
-  %61 = zext nneg i8 %0 to i32
-  %62 = shl i32 %61, 31
-  br label %63
-
-63:                                               ; preds = %59, %47, %42
-  %64 = phi i32 [ %60, %59 ], [ %55, %47 ], [ 2139095040, %42 ]
-  %65 = phi i32 [ %62, %59 ], [ %53, %47 ], [ %44, %42 ]
-  %66 = or disjoint i32 %65, %64
-  ret i32 %66
+59:                                               ; preds = %56, %48, %41
+  %60 = phi i32 [ %47, %56 ], [ %55, %48 ], [ 2139095040, %41 ]
+  %61 = phi i32 [ %58, %56 ], [ %53, %48 ], [ %43, %41 ]
+  %62 = or disjoint i32 %61, %60
+  ret i32 %62
 }
 
 ; Function Attrs: mustprogress nofree norecurse nosync nounwind sspstrong willreturn memory(none) uwtable
@@ -353,7 +340,7 @@ define noundef i32 @f32_negate(i32 noundef %0) local_unnamed_addr #1 {
   ret i32 %8
 }
 
-; Function Attrs: nounwind sspstrong uwtable
+; Function Attrs: nofree norecurse nosync nounwind sspstrong memory(none) uwtable
 define i32 @f32_sub(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = and i32 %1, 2139095040
   %4 = icmp ne i32 %3, 2139095040
@@ -366,7 +353,7 @@ define i32 @f32_sub(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   ret i32 %10
 }
 
-; Function Attrs: nounwind sspstrong uwtable
+; Function Attrs: nofree norecurse nosync nounwind sspstrong memory(none) uwtable
 define i32 @f32_mul(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = and i32 %0, 2139095040
   %4 = icmp eq i32 %3, 2139095040
@@ -455,7 +442,7 @@ define i32 @f32_mul(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   ret i32 %68
 }
 
-; Function Attrs: nounwind sspstrong uwtable
+; Function Attrs: nofree norecurse nosync nounwind sspstrong memory(none) uwtable
 define i32 @f32_div(i32 noundef %0, i32 noundef %1) local_unnamed_addr #0 {
   %3 = and i32 %0, 2139095040
   %4 = icmp eq i32 %3, 2139095040
@@ -713,16 +700,15 @@ define i64 @f32_to_ll(i32 noundef %0) local_unnamed_addr #1 {
   ret i64 %45
 }
 
-; Function Attrs: nounwind sspstrong uwtable
+; Function Attrs: nofree norecurse nosync nounwind sspstrong memory(none) uwtable
 define i32 @f32_from_ll(i64 noundef %0) local_unnamed_addr #0 {
   switch i64 %0, label %3 [
     i64 -9223372036854775808, label %2
-    i64 0, label %64
+    i64 0, label %60
   ]
 
 2:                                                ; preds = %1
-  tail call void @__assert_fail(ptr noundef nonnull @.str, ptr noundef nonnull @.str.1, i32 noundef 72, ptr noundef nonnull @__PRETTY_FUNCTION__.build_float) #4
-  unreachable
+  br label %60
 
 3:                                                ; preds = %1
   %4 = tail call i64 @llvm.abs.i64(i64 %0, i1 true)
@@ -769,66 +755,52 @@ define i32 @f32_from_ll(i64 noundef %0) local_unnamed_addr #0 {
   %37 = icmp ugt i64 %36, 16777215
   %38 = zext i1 %37 to i32
   %39 = add i32 %35, %38
-  %40 = select i1 %37, i64 8388608, i64 %36
-  %41 = icmp sgt i32 %39, 127
-  br i1 %41, label %42, label %44
+  %40 = icmp sgt i32 %39, 127
+  br i1 %40, label %41, label %43
 
-42:                                               ; preds = %34
-  %43 = shl nuw i32 %10, 31
-  br label %60
+41:                                               ; preds = %34
+  %42 = shl nuw i32 %10, 31
+  br label %56
 
-44:                                               ; preds = %34
-  %45 = icmp ugt i64 %40, 8388607
-  br i1 %45, label %46, label %54
+43:                                               ; preds = %34
+  %44 = select i1 %37, i64 8388608, i64 %36
+  %45 = icmp ugt i64 %44, 8388607
+  %46 = trunc i64 %44 to i32
+  br i1 %45, label %47, label %54
 
-46:                                               ; preds = %44
-  %47 = trunc i64 %40 to i32
-  %48 = and i32 %47, 8388607
+47:                                               ; preds = %43
+  %48 = and i32 %46, 8388607
   %49 = shl i32 %39, 23
   %50 = add i32 %49, 1065353216
   %51 = and i32 %50, 2139095040
   %52 = or disjoint i32 %51, %48
   %53 = shl nuw i32 %10, 31
+  br label %56
+
+54:                                               ; preds = %43
+  %55 = shl nuw i32 %10, 31
+  br label %56
+
+56:                                               ; preds = %41, %47, %54
+  %57 = phi i32 [ %46, %54 ], [ %53, %47 ], [ 2139095040, %41 ]
+  %58 = phi i32 [ %55, %54 ], [ %52, %47 ], [ %42, %41 ]
+  %59 = or disjoint i32 %58, %57
   br label %60
 
-54:                                               ; preds = %44
-  %55 = icmp eq i32 %39, -126
-  br i1 %55, label %57, label %56
-
-56:                                               ; preds = %54
-  tail call void @__assert_fail(ptr noundef nonnull @.str, ptr noundef nonnull @.str.1, i32 noundef 72, ptr noundef nonnull @__PRETTY_FUNCTION__.build_float) #4
-  unreachable
-
-57:                                               ; preds = %54
-  %58 = trunc i64 %40 to i32
-  %59 = shl nuw i32 %10, 31
-  br label %60
-
-60:                                               ; preds = %42, %46, %57
-  %61 = phi i32 [ %58, %57 ], [ %53, %46 ], [ 2139095040, %42 ]
-  %62 = phi i32 [ %59, %57 ], [ %52, %46 ], [ %43, %42 ]
-  %63 = or disjoint i32 %62, %61
-  br label %64
-
-64:                                               ; preds = %1, %60
-  %65 = phi i32 [ %63, %60 ], [ 0, %1 ]
-  ret i32 %65
+60:                                               ; preds = %1, %56, %2
+  %61 = phi i32 [ -2147483647, %2 ], [ %59, %56 ], [ 0, %1 ]
+  ret i32 %61
 }
 
-; Function Attrs: noreturn nounwind
-declare void @__assert_fail(ptr noundef, ptr noundef, i32 noundef, ptr noundef) local_unnamed_addr #2
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare i32 @llvm.umin.i32(i32, i32) #2
 
 ; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
-declare i32 @llvm.umin.i32(i32, i32) #3
+declare i64 @llvm.abs.i64(i64, i1 immarg) #2
 
-; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
-declare i64 @llvm.abs.i64(i64, i1 immarg) #3
-
-attributes #0 = { nounwind sspstrong uwtable "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="4" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" "zero-call-used-regs"="used-gpr" }
+attributes #0 = { nofree norecurse nosync nounwind sspstrong memory(none) uwtable "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="4" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" "zero-call-used-regs"="used-gpr" }
 attributes #1 = { mustprogress nofree norecurse nosync nounwind sspstrong willreturn memory(none) uwtable "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="4" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" "zero-call-used-regs"="used-gpr" }
-attributes #2 = { noreturn nounwind "no-trapping-math"="true" "stack-protector-buffer-size"="4" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" "zero-call-used-regs"="used-gpr" }
-attributes #3 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
-attributes #4 = { noreturn nounwind }
+attributes #2 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
 
 !llvm.module.flags = !{!0, !1, !2}
 !llvm.ident = !{!3}
