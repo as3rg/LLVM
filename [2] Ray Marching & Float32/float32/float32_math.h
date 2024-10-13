@@ -119,10 +119,4 @@
 
 #define F32_TRIG_PRES 100
 
-F32_FLOAT_T f32_sin(F32_FLOAT_T f);
-
-F32_FLOAT_T f32_cos(F32_FLOAT_T f);
-
-F32_FLOAT_T f32_tan(F32_FLOAT_T f);
-
 #endif
