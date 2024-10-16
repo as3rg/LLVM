@@ -58,8 +58,3 @@ void simPutPixel(int x, int y, int argb)
     SDL_RenderDrawPoint(Renderer, x, y);
     Ticks = SDL_GetTicks();
 }
-
-int simRand()
-{
-    return rand();
-}

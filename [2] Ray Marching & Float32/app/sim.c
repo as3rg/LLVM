@@ -1,4 +1,3 @@
-#ifndef __sim__
 #include <stdlib.h>
 #include <assert.h>
 #include <SDL2/SDL.h>
@@ -59,4 +58,3 @@ void simPutPixel(int x, int y, int argb)
     SDL_RenderDrawPoint(Renderer, x, y);
     Ticks = SDL_GetTicks();
 }
-#endif

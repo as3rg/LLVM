@@ -9,22 +9,19 @@ get-app:
 
 get-gen: build-gen-gen get-app
 	cd build && \
-	clang -D__sim__ code/**/*.c -O3 -S -emit-llvm && \
+	clang code/app/app.c code/float32/*.c -O3 -S -emit-llvm && \
 	llvm-link -o single.ll -S *.ll && \
 	clang -Wno-unused-command-line-argument -fpass-plugin=./generator-generator.so -c single.ll > ../generator.cpp
 
 build-gen: get-gen
 	cd build && \
-	clang++ -std=c++23 -Wno-implicitly-unsigned-literal $$(llvm-config --cppflags --ldflags --libs) code/app/sim.c ../generator.cpp -lSDL2 -o generator.out 
+	clang++ -std=c++23 -Wno-implicitly-unsigned-literal $$(llvm-config --cppflags --ldflags --libs) -I./code code/app/sim.c ../generator.cpp -lSDL2 -o generator.out 
 
-run-gen: build-gen
+run: build-gen
 	./build/generator.out run
 
-run-raw: build-gen
-	cd build && \
-	./generator.out print > generated.ll && \
-	clang generated.ll code/app/sim.c -lSDL2 -o app.out && \
-	./app.out
+ir: build-gen
+	./build/generator.out print
 
 clean:
 	rm -rf build

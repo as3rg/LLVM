@@ -1,5 +1,7 @@
 #include "sim.h"
 
+extern void app();
+
 int main(void)
 {
     simInit();

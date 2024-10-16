@@ -3,13 +3,9 @@
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
+#include "app/sim.h"
 #include <array>
 #include <string>
-
-void simInit();
-void simExit();
-void simFlush();
-void simPutPixel(int x, int y, int argb);
 
 using namespace llvm;
 
@@ -59,15 +55,12 @@ int main(int argc, char* argv[]) {
   Function *funcf32_to_ll = Function::Create(FunctionType::get(Type::getInt64Ty(context), { Type::getInt32Ty(context) }, false), Function::ExternalLinkage, "f32_to_ll", module);
   Function *funcf32_from_ll = Function::Create(FunctionType::get(Type::getInt32Ty(context), { Type::getInt64Ty(context) }, false), Function::ExternalLinkage, "f32_from_ll", module);
   Function *funcllvm_abs_i64 = Function::Create(FunctionType::get(Type::getInt64Ty(context), { Type::getInt64Ty(context), Type::getInt1Ty(context) }, false), Function::ExternalLinkage, "llvm.abs.i64", module);
-  Function *funcmain = Function::Create(FunctionType::get(Type::getInt32Ty(context), {  }, false), Function::ExternalLinkage, "main", module);
-  Function *funcsimInit = Function::Create(FunctionType::get(Type::getVoidTy(context), {  }, false), Function::ExternalLinkage, "simInit", module);
-  Function *funcsimExit = Function::Create(FunctionType::get(Type::getVoidTy(context), {  }, false), Function::ExternalLinkage, "simExit", module);
   {
     Function *func = funcsqr;
     BasicBlock *val1 = BasicBlock::Create(context, "", func);
     Value *val0 = func->getArg(0);
     builder.SetInsertPoint(val1);
-    //   %2 = tail call i32 @f32_mul(i32 noundef %0, i32 noundef %0) #10
+    //   %2 = tail call i32 @f32_mul(i32 noundef %0, i32 noundef %0) #9
     Value *val2 = builder.CreateCall(funcf32_mul, {val0, val0});
     //   ret i32 %2
     builder.CreateRet(val2);
@@ -82,15 +75,15 @@ int main(int argc, char* argv[]) {
     Value *val4 = func->getArg(4);
     Value *val5 = func->getArg(5);
     builder.SetInsertPoint(val6);
-    //   %7 = tail call i32 @f32_mul(i32 noundef %0, i32 noundef %3) #10
+    //   %7 = tail call i32 @f32_mul(i32 noundef %0, i32 noundef %3) #9
     Value *val7 = builder.CreateCall(funcf32_mul, {val0, val3});
-    //   %8 = tail call i32 @f32_mul(i32 noundef %1, i32 noundef %4) #10
+    //   %8 = tail call i32 @f32_mul(i32 noundef %1, i32 noundef %4) #9
     Value *val8 = builder.CreateCall(funcf32_mul, {val1, val4});
-    //   %9 = tail call i32 @f32_add(i32 noundef %7, i32 noundef %8) #10
+    //   %9 = tail call i32 @f32_add(i32 noundef %7, i32 noundef %8) #9
     Value *val9 = builder.CreateCall(funcf32_add, {val7, val8});
-    //   %10 = tail call i32 @f32_mul(i32 noundef %2, i32 noundef %5) #10
+    //   %10 = tail call i32 @f32_mul(i32 noundef %2, i32 noundef %5) #9
     Value *val10 = builder.CreateCall(funcf32_mul, {val2, val5});
-    //   %11 = tail call i32 @f32_add(i32 noundef %9, i32 noundef %10) #10
+    //   %11 = tail call i32 @f32_add(i32 noundef %9, i32 noundef %10) #9
     Value *val11 = builder.CreateCall(funcf32_add, {val9, val10});
     //   ret i32 %11
     builder.CreateRet(val11);
@@ -102,15 +95,15 @@ int main(int argc, char* argv[]) {
     Value *val1 = func->getArg(1);
     Value *val2 = func->getArg(2);
     builder.SetInsertPoint(val3);
-    //   %4 = tail call i32 @f32_mul(i32 noundef %0, i32 noundef %0) #10
+    //   %4 = tail call i32 @f32_mul(i32 noundef %0, i32 noundef %0) #9
     Value *val4 = builder.CreateCall(funcf32_mul, {val0, val0});
-    //   %5 = tail call i32 @f32_mul(i32 noundef %1, i32 noundef %1) #10
+    //   %5 = tail call i32 @f32_mul(i32 noundef %1, i32 noundef %1) #9
     Value *val5 = builder.CreateCall(funcf32_mul, {val1, val1});
-    //   %6 = tail call i32 @f32_add(i32 noundef %4, i32 noundef %5) #10
+    //   %6 = tail call i32 @f32_add(i32 noundef %4, i32 noundef %5) #9
     Value *val6 = builder.CreateCall(funcf32_add, {val4, val5});
-    //   %7 = tail call i32 @f32_mul(i32 noundef %2, i32 noundef %2) #10
+    //   %7 = tail call i32 @f32_mul(i32 noundef %2, i32 noundef %2) #9
     Value *val7 = builder.CreateCall(funcf32_mul, {val2, val2});
-    //   %8 = tail call i32 @f32_add(i32 noundef %6, i32 noundef %7) #10
+    //   %8 = tail call i32 @f32_add(i32 noundef %6, i32 noundef %7) #9
     Value *val8 = builder.CreateCall(funcf32_add, {val6, val7});
     //   ret i32 %8
     builder.CreateRet(val8);
@@ -120,15 +113,15 @@ int main(int argc, char* argv[]) {
     BasicBlock *valbuild_float_exit = BasicBlock::Create(context, "", func);
     Value *val0 = func->getArg(0);
     builder.SetInsertPoint(valbuild_float_exit);
-    //   %1 = tail call i32 @f32_div(i32 noundef %0, i32 noundef 1073741824) #10
+    //   %1 = tail call i32 @f32_div(i32 noundef %0, i32 noundef 1073741824) #9
     Value *val1 = builder.CreateCall(funcf32_div, {val0, builder.getInt32(1073741824)});
     //   %2 = lshr i32 %0, 1
     Value *val2 = builder.CreateLShr(val0, builder.getInt32(1), "", false);
     //   %3 = sub nsw i32 1597463007, %2
     Value *val3 = builder.CreateSub(builder.getInt32(1597463007), val2, "", false, true);
-    //   %4 = tail call i32 @f32_mul(i32 noundef %3, i32 noundef %3) #10
+    //   %4 = tail call i32 @f32_mul(i32 noundef %3, i32 noundef %3) #9
     Value *val4 = builder.CreateCall(funcf32_mul, {val3, val3});
-    //   %5 = tail call i32 @f32_mul(i32 noundef %1, i32 noundef %4) #10
+    //   %5 = tail call i32 @f32_mul(i32 noundef %1, i32 noundef %4) #9
     Value *val5 = builder.CreateCall(funcf32_mul, {val1, val4});
     //   %6 = and i32 %5, 2139095040
     Value *val6 = builder.CreateAnd(val5, builder.getInt32(2139095040), "");
@@ -146,7 +139,7 @@ int main(int argc, char* argv[]) {
     Value *val12 = builder.CreateSelect(val10, val11, val5);
     //   %13 = tail call i32 @f32_add(i32 noundef 1069547520, i32 noundef %12)
     Value *val13 = builder.CreateCall(funcf32_add, {builder.getInt32(1069547520), val12});
-    //   %14 = tail call i32 @f32_mul(i32 noundef %3, i32 noundef %13) #10
+    //   %14 = tail call i32 @f32_mul(i32 noundef %3, i32 noundef %13) #9
     Value *val14 = builder.CreateCall(funcf32_mul, {val3, val13});
     //   ret i32 %14
     builder.CreateRet(val14);
@@ -346,7 +339,7 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valf32_from_ll_exit);
     //   %53 = phi i32 [ 0, %3 ], [ %52, %47 ], [ 2139095040, %37 ], [ %46, %43 ]
     PHINode *val53 = builder.CreatePHI(Type::getInt32Ty(context), 4);
-    //   %54 = tail call i32 @f32_mul(i32 noundef %53, i32 noundef %2) #10
+    //   %54 = tail call i32 @f32_mul(i32 noundef %53, i32 noundef %2) #9
     Value *val54 = builder.CreateCall(funcf32_mul, {val53, val2});
     //   %55 = and i32 %1, 16711680
     Value *val55 = builder.CreateAnd(val1, builder.getInt32(16711680), "");
@@ -446,9 +439,9 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valf32_from_ll_exit2);
     //   %96 = phi i32 [ 0, %f32_from_ll.exit ], [ %95, %90 ], [ 2139095040, %80 ], [ %89, %86 ]
     PHINode *val96 = builder.CreatePHI(Type::getInt32Ty(context), 4);
-    //   %97 = tail call i32 @f32_mul(i32 noundef %96, i32 noundef %11) #10
+    //   %97 = tail call i32 @f32_mul(i32 noundef %96, i32 noundef %11) #9
     Value *val97 = builder.CreateCall(funcf32_mul, {val96, val11});
-    //   %98 = tail call i32 @f32_add(i32 noundef %54, i32 noundef %97) #10
+    //   %98 = tail call i32 @f32_add(i32 noundef %54, i32 noundef %97) #9
     Value *val98 = builder.CreateCall(funcf32_add, {val54, val97});
     //   %99 = and i32 %98, 2147483647
     Value *val99 = builder.CreateAnd(val98, builder.getInt32(2147483647), "");
@@ -644,7 +637,7 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valf32_from_ll_exit4);
     //   %183 = phi i32 [ 0, %f32_to_ll.exit ], [ %182, %177 ], [ 2139095040, %167 ], [ %176, %173 ]
     PHINode *val183 = builder.CreatePHI(Type::getInt32Ty(context), 4);
-    //   %184 = tail call i32 @f32_mul(i32 noundef %183, i32 noundef %2) #10
+    //   %184 = tail call i32 @f32_mul(i32 noundef %183, i32 noundef %2) #9
     Value *val184 = builder.CreateCall(funcf32_mul, {val183, val2});
     //   %185 = and i32 %1, 65280
     Value *val185 = builder.CreateAnd(val1, builder.getInt32(65280), "");
@@ -744,9 +737,9 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valf32_from_ll_exit6);
     //   %226 = phi i32 [ 0, %f32_from_ll.exit4 ], [ %225, %220 ], [ 2139095040, %210 ], [ %219, %216 ]
     PHINode *val226 = builder.CreatePHI(Type::getInt32Ty(context), 4);
-    //   %227 = tail call i32 @f32_mul(i32 noundef %226, i32 noundef %11) #10
+    //   %227 = tail call i32 @f32_mul(i32 noundef %226, i32 noundef %11) #9
     Value *val227 = builder.CreateCall(funcf32_mul, {val226, val11});
-    //   %228 = tail call i32 @f32_add(i32 noundef %184, i32 noundef %227) #10
+    //   %228 = tail call i32 @f32_add(i32 noundef %184, i32 noundef %227) #9
     Value *val228 = builder.CreateCall(funcf32_add, {val184, val227});
     //   %229 = and i32 %228, 2147483647
     Value *val229 = builder.CreateAnd(val228, builder.getInt32(2147483647), "");
@@ -949,7 +942,7 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valf32_from_ll_exit9);
     //   %314 = phi i32 [ 0, %f32_to_ll.exit7 ], [ %313, %308 ], [ 2139095040, %297 ], [ %307, %304 ]
     PHINode *val314 = builder.CreatePHI(Type::getInt32Ty(context), 4);
-    //   %315 = tail call i32 @f32_mul(i32 noundef %314, i32 noundef %2) #10
+    //   %315 = tail call i32 @f32_mul(i32 noundef %314, i32 noundef %2) #9
     Value *val315 = builder.CreateCall(funcf32_mul, {val314, val2});
     //   %316 = and i32 %1, 255
     Value *val316 = builder.CreateAnd(val1, builder.getInt32(255), "");
@@ -1056,9 +1049,9 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valf32_from_ll_exit11);
     //   %358 = phi i32 [ 0, %f32_from_ll.exit9 ], [ %357, %352 ], [ 2139095040, %341 ], [ %351, %348 ]
     PHINode *val358 = builder.CreatePHI(Type::getInt32Ty(context), 4);
-    //   %359 = tail call i32 @f32_mul(i32 noundef %358, i32 noundef %11) #10
+    //   %359 = tail call i32 @f32_mul(i32 noundef %358, i32 noundef %11) #9
     Value *val359 = builder.CreateCall(funcf32_mul, {val358, val11});
-    //   %360 = tail call i32 @f32_add(i32 noundef %315, i32 noundef %359) #10
+    //   %360 = tail call i32 @f32_add(i32 noundef %315, i32 noundef %359) #9
     Value *val360 = builder.CreateCall(funcf32_add, {val315, val359});
     //   %361 = and i32 %360, 2147483647
     Value *val361 = builder.CreateAnd(val360, builder.getInt32(2147483647), "");
@@ -1592,9 +1585,9 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valf32_from_ll_exit2);
     //   %89 = phi i32 [ 0, %f32_from_ll.exit ], [ %88, %83 ], [ 2139095040, %73 ], [ %82, %79 ]
     PHINode *val89 = builder.CreatePHI(Type::getInt32Ty(context), 4);
-    //   %90 = tail call i32 @f32_mul(i32 noundef %47, i32 noundef %89) #10
+    //   %90 = tail call i32 @f32_mul(i32 noundef %47, i32 noundef %89) #9
     Value *val90 = builder.CreateCall(funcf32_mul, {val47, val89});
-    //   %91 = tail call i32 @f32_mul(i32 noundef %90, i32 noundef %2) #10
+    //   %91 = tail call i32 @f32_mul(i32 noundef %90, i32 noundef %2) #9
     Value *val91 = builder.CreateCall(funcf32_mul, {val90, val2});
     //   br label %.preheader.i3
     builder.CreateBr(val_preheader_i3);
@@ -1683,7 +1676,7 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valf32_from_ll_exit4);
     //   %129 = phi i32 [ %128, %123 ], [ 2139095040, %113 ], [ %122, %119 ]
     PHINode *val129 = builder.CreatePHI(Type::getInt32Ty(context), 3);
-    //   %130 = tail call i32 @f32_div(i32 noundef %91, i32 noundef %129) #10
+    //   %130 = tail call i32 @f32_div(i32 noundef %91, i32 noundef %129) #9
     Value *val130 = builder.CreateCall(funcf32_div, {val91, val129});
     //   %131 = and i32 %130, 2147483647
     Value *val131 = builder.CreateAnd(val130, builder.getInt32(2147483647), "");
@@ -1981,9 +1974,9 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valf32_from_ll_exit8);
     //   %259 = phi i32 [ 0, %f32_from_ll.exit6 ], [ %258, %253 ], [ 2139095040, %243 ], [ %252, %249 ]
     PHINode *val259 = builder.CreatePHI(Type::getInt32Ty(context), 4);
-    //   %260 = tail call i32 @f32_mul(i32 noundef %217, i32 noundef %259) #10
+    //   %260 = tail call i32 @f32_mul(i32 noundef %217, i32 noundef %259) #9
     Value *val260 = builder.CreateCall(funcf32_mul, {val217, val259});
-    //   %261 = tail call i32 @f32_mul(i32 noundef %260, i32 noundef %2) #10
+    //   %261 = tail call i32 @f32_mul(i32 noundef %260, i32 noundef %2) #9
     Value *val261 = builder.CreateCall(funcf32_mul, {val260, val2});
     //   br label %.preheader.i9
     builder.CreateBr(val_preheader_i9);
@@ -2072,7 +2065,7 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valf32_from_ll_exit10);
     //   %299 = phi i32 [ %298, %293 ], [ 2139095040, %283 ], [ %292, %289 ]
     PHINode *val299 = builder.CreatePHI(Type::getInt32Ty(context), 3);
-    //   %300 = tail call i32 @f32_div(i32 noundef %261, i32 noundef %299) #10
+    //   %300 = tail call i32 @f32_div(i32 noundef %261, i32 noundef %299) #9
     Value *val300 = builder.CreateCall(funcf32_div, {val261, val299});
     //   %301 = and i32 %300, 2147483647
     Value *val301 = builder.CreateAnd(val300, builder.getInt32(2147483647), "");
@@ -2384,9 +2377,9 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valf32_from_ll_exit15);
     //   %431 = phi i32 [ 0, %f32_from_ll.exit13 ], [ %430, %425 ], [ 2139095040, %414 ], [ %424, %421 ]
     PHINode *val431 = builder.CreatePHI(Type::getInt32Ty(context), 4);
-    //   %432 = tail call i32 @f32_mul(i32 noundef %388, i32 noundef %431) #10
+    //   %432 = tail call i32 @f32_mul(i32 noundef %388, i32 noundef %431) #9
     Value *val432 = builder.CreateCall(funcf32_mul, {val388, val431});
-    //   %433 = tail call i32 @f32_mul(i32 noundef %432, i32 noundef %2) #10
+    //   %433 = tail call i32 @f32_mul(i32 noundef %432, i32 noundef %2) #9
     Value *val433 = builder.CreateCall(funcf32_mul, {val432, val2});
     //   br label %.preheader.i16
     builder.CreateBr(val_preheader_i16);
@@ -2475,7 +2468,7 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valf32_from_ll_exit17);
     //   %471 = phi i32 [ %470, %465 ], [ 2139095040, %455 ], [ %464, %461 ]
     PHINode *val471 = builder.CreatePHI(Type::getInt32Ty(context), 3);
-    //   %472 = tail call i32 @f32_div(i32 noundef %433, i32 noundef %471) #10
+    //   %472 = tail call i32 @f32_div(i32 noundef %433, i32 noundef %471) #9
     Value *val472 = builder.CreateCall(funcf32_div, {val433, val471});
     //   %473 = and i32 %472, 2147483647
     Value *val473 = builder.CreateAnd(val472, builder.getInt32(2147483647), "");
@@ -2886,25 +2879,25 @@ int main(int argc, char* argv[]) {
     Value *val55 = builder.CreateSelect(val53, val54, val25);
     //   %56 = tail call i32 @f32_add(i32 noundef %48, i32 noundef %55)
     Value *val56 = builder.CreateCall(funcf32_add, {val48, val55});
-    //   %57 = tail call i32 @f32_mul(i32 noundef %38, i32 noundef %38) #10
+    //   %57 = tail call i32 @f32_mul(i32 noundef %38, i32 noundef %38) #9
     Value *val57 = builder.CreateCall(funcf32_mul, {val38, val38});
-    //   %58 = tail call i32 @f32_mul(i32 noundef %47, i32 noundef %47) #10
+    //   %58 = tail call i32 @f32_mul(i32 noundef %47, i32 noundef %47) #9
     Value *val58 = builder.CreateCall(funcf32_mul, {val47, val47});
-    //   %59 = tail call i32 @f32_add(i32 noundef %57, i32 noundef %58) #10
+    //   %59 = tail call i32 @f32_add(i32 noundef %57, i32 noundef %58) #9
     Value *val59 = builder.CreateCall(funcf32_add, {val57, val58});
-    //   %60 = tail call i32 @f32_mul(i32 noundef %56, i32 noundef %56) #10
+    //   %60 = tail call i32 @f32_mul(i32 noundef %56, i32 noundef %56) #9
     Value *val60 = builder.CreateCall(funcf32_mul, {val56, val56});
-    //   %61 = tail call i32 @f32_add(i32 noundef %59, i32 noundef %60) #10
+    //   %61 = tail call i32 @f32_add(i32 noundef %59, i32 noundef %60) #9
     Value *val61 = builder.CreateCall(funcf32_add, {val59, val60});
-    //   %62 = tail call i32 @f32_div(i32 noundef %61, i32 noundef 1073741824) #10
+    //   %62 = tail call i32 @f32_div(i32 noundef %61, i32 noundef 1073741824) #9
     Value *val62 = builder.CreateCall(funcf32_div, {val61, builder.getInt32(1073741824)});
     //   %63 = lshr i32 %61, 1
     Value *val63 = builder.CreateLShr(val61, builder.getInt32(1), "", false);
     //   %64 = sub nsw i32 1597463007, %63
     Value *val64 = builder.CreateSub(builder.getInt32(1597463007), val63, "", false, true);
-    //   %65 = tail call i32 @f32_mul(i32 noundef %64, i32 noundef %64) #10
+    //   %65 = tail call i32 @f32_mul(i32 noundef %64, i32 noundef %64) #9
     Value *val65 = builder.CreateCall(funcf32_mul, {val64, val64});
-    //   %66 = tail call i32 @f32_mul(i32 noundef %62, i32 noundef %65) #10
+    //   %66 = tail call i32 @f32_mul(i32 noundef %62, i32 noundef %65) #9
     Value *val66 = builder.CreateCall(funcf32_mul, {val62, val65});
     //   %67 = and i32 %66, 2139095040
     Value *val67 = builder.CreateAnd(val66, builder.getInt32(2139095040), "");
@@ -2922,9 +2915,9 @@ int main(int argc, char* argv[]) {
     Value *val73 = builder.CreateSelect(val71, val72, val66);
     //   %74 = tail call i32 @f32_add(i32 noundef 1069547520, i32 noundef %73)
     Value *val74 = builder.CreateCall(funcf32_add, {builder.getInt32(1069547520), val73});
-    //   %75 = tail call i32 @f32_mul(i32 noundef %64, i32 noundef %74) #10
+    //   %75 = tail call i32 @f32_mul(i32 noundef %64, i32 noundef %74) #9
     Value *val75 = builder.CreateCall(funcf32_mul, {val64, val74});
-    //   %76 = tail call i32 @f32_mul(i32 noundef %61, i32 noundef %75) #10
+    //   %76 = tail call i32 @f32_mul(i32 noundef %61, i32 noundef %75) #9
     Value *val76 = builder.CreateCall(funcf32_mul, {val61, val75});
     //   %77 = load i32, ptr %3, align 4, !tbaa !4
     Value *val77 = builder.CreateAlignedLoad(Type::getInt32Ty(context), val3, MaybeAlign(4));
@@ -2944,15 +2937,15 @@ int main(int argc, char* argv[]) {
     Value *val84 = builder.CreateSelect(val82, val83, val77);
     //   %85 = tail call i32 @f32_add(i32 noundef %76, i32 noundef %84)
     Value *val85 = builder.CreateCall(funcf32_add, {val76, val84});
-    //   %86 = tail call i32 @f32_mul(i32 noundef %9, i32 noundef %38) #10
+    //   %86 = tail call i32 @f32_mul(i32 noundef %9, i32 noundef %38) #9
     Value *val86 = builder.CreateCall(funcf32_mul, {val9, val38});
-    //   %87 = tail call i32 @f32_mul(i32 noundef %10, i32 noundef %47) #10
+    //   %87 = tail call i32 @f32_mul(i32 noundef %10, i32 noundef %47) #9
     Value *val87 = builder.CreateCall(funcf32_mul, {val10, val47});
-    //   %88 = tail call i32 @f32_add(i32 noundef %86, i32 noundef %87) #10
+    //   %88 = tail call i32 @f32_add(i32 noundef %86, i32 noundef %87) #9
     Value *val88 = builder.CreateCall(funcf32_add, {val86, val87});
-    //   %89 = tail call i32 @f32_mul(i32 noundef %11, i32 noundef %56) #10
+    //   %89 = tail call i32 @f32_mul(i32 noundef %11, i32 noundef %56) #9
     Value *val89 = builder.CreateCall(funcf32_mul, {val11, val56});
-    //   %90 = tail call i32 @f32_add(i32 noundef %88, i32 noundef %89) #10
+    //   %90 = tail call i32 @f32_add(i32 noundef %88, i32 noundef %89) #9
     Value *val90 = builder.CreateCall(funcf32_add, {val88, val89});
     //   %91 = and i32 %85, 2139095040
     Value *val91 = builder.CreateAnd(val85, builder.getInt32(2139095040), "");
@@ -3010,25 +3003,25 @@ int main(int argc, char* argv[]) {
     Value *val107 = builder.CreateAlignedLoad(Type::getInt32Ty(context), val17, MaybeAlign(4));
     //   %108 = tail call i32 @f32_add(i32 noundef %107, i32 noundef %55)
     Value *val108 = builder.CreateCall(funcf32_add, {val107, val55});
-    //   %109 = tail call i32 @f32_mul(i32 noundef %104, i32 noundef %104) #10
+    //   %109 = tail call i32 @f32_mul(i32 noundef %104, i32 noundef %104) #9
     Value *val109 = builder.CreateCall(funcf32_mul, {val104, val104});
-    //   %110 = tail call i32 @f32_mul(i32 noundef %106, i32 noundef %106) #10
+    //   %110 = tail call i32 @f32_mul(i32 noundef %106, i32 noundef %106) #9
     Value *val110 = builder.CreateCall(funcf32_mul, {val106, val106});
-    //   %111 = tail call i32 @f32_add(i32 noundef %109, i32 noundef %110) #10
+    //   %111 = tail call i32 @f32_add(i32 noundef %109, i32 noundef %110) #9
     Value *val111 = builder.CreateCall(funcf32_add, {val109, val110});
-    //   %112 = tail call i32 @f32_mul(i32 noundef %108, i32 noundef %108) #10
+    //   %112 = tail call i32 @f32_mul(i32 noundef %108, i32 noundef %108) #9
     Value *val112 = builder.CreateCall(funcf32_mul, {val108, val108});
-    //   %113 = tail call i32 @f32_add(i32 noundef %111, i32 noundef %112) #10
+    //   %113 = tail call i32 @f32_add(i32 noundef %111, i32 noundef %112) #9
     Value *val113 = builder.CreateCall(funcf32_add, {val111, val112});
-    //   %114 = tail call i32 @f32_div(i32 noundef %113, i32 noundef 1073741824) #10
+    //   %114 = tail call i32 @f32_div(i32 noundef %113, i32 noundef 1073741824) #9
     Value *val114 = builder.CreateCall(funcf32_div, {val113, builder.getInt32(1073741824)});
     //   %115 = lshr i32 %113, 1
     Value *val115 = builder.CreateLShr(val113, builder.getInt32(1), "", false);
     //   %116 = sub nsw i32 1597463007, %115
     Value *val116 = builder.CreateSub(builder.getInt32(1597463007), val115, "", false, true);
-    //   %117 = tail call i32 @f32_mul(i32 noundef %116, i32 noundef %116) #10
+    //   %117 = tail call i32 @f32_mul(i32 noundef %116, i32 noundef %116) #9
     Value *val117 = builder.CreateCall(funcf32_mul, {val116, val116});
-    //   %118 = tail call i32 @f32_mul(i32 noundef %114, i32 noundef %117) #10
+    //   %118 = tail call i32 @f32_mul(i32 noundef %114, i32 noundef %117) #9
     Value *val118 = builder.CreateCall(funcf32_mul, {val114, val117});
     //   %119 = and i32 %118, 2139095040
     Value *val119 = builder.CreateAnd(val118, builder.getInt32(2139095040), "");
@@ -3046,9 +3039,9 @@ int main(int argc, char* argv[]) {
     Value *val125 = builder.CreateSelect(val123, val124, val118);
     //   %126 = tail call i32 @f32_add(i32 noundef 1069547520, i32 noundef %125)
     Value *val126 = builder.CreateCall(funcf32_add, {builder.getInt32(1069547520), val125});
-    //   %127 = tail call i32 @f32_mul(i32 noundef %116, i32 noundef %126) #10
+    //   %127 = tail call i32 @f32_mul(i32 noundef %116, i32 noundef %126) #9
     Value *val127 = builder.CreateCall(funcf32_mul, {val116, val126});
-    //   %128 = tail call i32 @f32_mul(i32 noundef %113, i32 noundef %127) #10
+    //   %128 = tail call i32 @f32_mul(i32 noundef %113, i32 noundef %127) #9
     Value *val128 = builder.CreateCall(funcf32_mul, {val113, val127});
     //   %129 = load i32, ptr %18, align 4, !tbaa !4
     Value *val129 = builder.CreateAlignedLoad(Type::getInt32Ty(context), val18, MaybeAlign(4));
@@ -3068,15 +3061,15 @@ int main(int argc, char* argv[]) {
     Value *val136 = builder.CreateSelect(val134, val135, val129);
     //   %137 = tail call i32 @f32_add(i32 noundef %128, i32 noundef %136)
     Value *val137 = builder.CreateCall(funcf32_add, {val128, val136});
-    //   %138 = tail call i32 @f32_mul(i32 noundef %9, i32 noundef %104) #10
+    //   %138 = tail call i32 @f32_mul(i32 noundef %9, i32 noundef %104) #9
     Value *val138 = builder.CreateCall(funcf32_mul, {val9, val104});
-    //   %139 = tail call i32 @f32_mul(i32 noundef %10, i32 noundef %106) #10
+    //   %139 = tail call i32 @f32_mul(i32 noundef %10, i32 noundef %106) #9
     Value *val139 = builder.CreateCall(funcf32_mul, {val10, val106});
-    //   %140 = tail call i32 @f32_add(i32 noundef %138, i32 noundef %139) #10
+    //   %140 = tail call i32 @f32_add(i32 noundef %138, i32 noundef %139) #9
     Value *val140 = builder.CreateCall(funcf32_add, {val138, val139});
-    //   %141 = tail call i32 @f32_mul(i32 noundef %11, i32 noundef %108) #10
+    //   %141 = tail call i32 @f32_mul(i32 noundef %11, i32 noundef %108) #9
     Value *val141 = builder.CreateCall(funcf32_mul, {val11, val108});
-    //   %142 = tail call i32 @f32_add(i32 noundef %140, i32 noundef %141) #10
+    //   %142 = tail call i32 @f32_add(i32 noundef %140, i32 noundef %141) #9
     Value *val142 = builder.CreateCall(funcf32_add, {val140, val141});
     //   %143 = and i32 %137, 2139095040
     Value *val143 = builder.CreateAnd(val137, builder.getInt32(2139095040), "");
@@ -3214,25 +3207,25 @@ int main(int argc, char* argv[]) {
     Value *val197 = builder.CreateAlignedLoad(Type::getInt32Ty(context), val21, MaybeAlign(4));
     //   %198 = tail call i32 @f32_add(i32 noundef %197, i32 noundef %55)
     Value *val198 = builder.CreateCall(funcf32_add, {val197, val55});
-    //   %199 = tail call i32 @f32_mul(i32 noundef %194, i32 noundef %194) #10
+    //   %199 = tail call i32 @f32_mul(i32 noundef %194, i32 noundef %194) #9
     Value *val199 = builder.CreateCall(funcf32_mul, {val194, val194});
-    //   %200 = tail call i32 @f32_mul(i32 noundef %196, i32 noundef %196) #10
+    //   %200 = tail call i32 @f32_mul(i32 noundef %196, i32 noundef %196) #9
     Value *val200 = builder.CreateCall(funcf32_mul, {val196, val196});
-    //   %201 = tail call i32 @f32_add(i32 noundef %199, i32 noundef %200) #10
+    //   %201 = tail call i32 @f32_add(i32 noundef %199, i32 noundef %200) #9
     Value *val201 = builder.CreateCall(funcf32_add, {val199, val200});
-    //   %202 = tail call i32 @f32_mul(i32 noundef %198, i32 noundef %198) #10
+    //   %202 = tail call i32 @f32_mul(i32 noundef %198, i32 noundef %198) #9
     Value *val202 = builder.CreateCall(funcf32_mul, {val198, val198});
-    //   %203 = tail call i32 @f32_add(i32 noundef %201, i32 noundef %202) #10
+    //   %203 = tail call i32 @f32_add(i32 noundef %201, i32 noundef %202) #9
     Value *val203 = builder.CreateCall(funcf32_add, {val201, val202});
-    //   %204 = tail call i32 @f32_div(i32 noundef %203, i32 noundef 1073741824) #10
+    //   %204 = tail call i32 @f32_div(i32 noundef %203, i32 noundef 1073741824) #9
     Value *val204 = builder.CreateCall(funcf32_div, {val203, builder.getInt32(1073741824)});
     //   %205 = lshr i32 %203, 1
     Value *val205 = builder.CreateLShr(val203, builder.getInt32(1), "", false);
     //   %206 = sub nsw i32 1597463007, %205
     Value *val206 = builder.CreateSub(builder.getInt32(1597463007), val205, "", false, true);
-    //   %207 = tail call i32 @f32_mul(i32 noundef %206, i32 noundef %206) #10
+    //   %207 = tail call i32 @f32_mul(i32 noundef %206, i32 noundef %206) #9
     Value *val207 = builder.CreateCall(funcf32_mul, {val206, val206});
-    //   %208 = tail call i32 @f32_mul(i32 noundef %204, i32 noundef %207) #10
+    //   %208 = tail call i32 @f32_mul(i32 noundef %204, i32 noundef %207) #9
     Value *val208 = builder.CreateCall(funcf32_mul, {val204, val207});
     //   %209 = and i32 %208, 2139095040
     Value *val209 = builder.CreateAnd(val208, builder.getInt32(2139095040), "");
@@ -3250,9 +3243,9 @@ int main(int argc, char* argv[]) {
     Value *val215 = builder.CreateSelect(val213, val214, val208);
     //   %216 = tail call i32 @f32_add(i32 noundef 1069547520, i32 noundef %215)
     Value *val216 = builder.CreateCall(funcf32_add, {builder.getInt32(1069547520), val215});
-    //   %217 = tail call i32 @f32_mul(i32 noundef %206, i32 noundef %216) #10
+    //   %217 = tail call i32 @f32_mul(i32 noundef %206, i32 noundef %216) #9
     Value *val217 = builder.CreateCall(funcf32_mul, {val206, val216});
-    //   %218 = tail call i32 @f32_mul(i32 noundef %203, i32 noundef %217) #10
+    //   %218 = tail call i32 @f32_mul(i32 noundef %203, i32 noundef %217) #9
     Value *val218 = builder.CreateCall(funcf32_mul, {val203, val217});
     //   %219 = load i32, ptr %22, align 4, !tbaa !4
     Value *val219 = builder.CreateAlignedLoad(Type::getInt32Ty(context), val22, MaybeAlign(4));
@@ -3272,15 +3265,15 @@ int main(int argc, char* argv[]) {
     Value *val226 = builder.CreateSelect(val224, val225, val219);
     //   %227 = tail call i32 @f32_add(i32 noundef %218, i32 noundef %226)
     Value *val227 = builder.CreateCall(funcf32_add, {val218, val226});
-    //   %228 = tail call i32 @f32_mul(i32 noundef %9, i32 noundef %194) #10
+    //   %228 = tail call i32 @f32_mul(i32 noundef %9, i32 noundef %194) #9
     Value *val228 = builder.CreateCall(funcf32_mul, {val9, val194});
-    //   %229 = tail call i32 @f32_mul(i32 noundef %10, i32 noundef %196) #10
+    //   %229 = tail call i32 @f32_mul(i32 noundef %10, i32 noundef %196) #9
     Value *val229 = builder.CreateCall(funcf32_mul, {val10, val196});
-    //   %230 = tail call i32 @f32_add(i32 noundef %228, i32 noundef %229) #10
+    //   %230 = tail call i32 @f32_add(i32 noundef %228, i32 noundef %229) #9
     Value *val230 = builder.CreateCall(funcf32_add, {val228, val229});
-    //   %231 = tail call i32 @f32_mul(i32 noundef %11, i32 noundef %198) #10
+    //   %231 = tail call i32 @f32_mul(i32 noundef %11, i32 noundef %198) #9
     Value *val231 = builder.CreateCall(funcf32_mul, {val11, val198});
-    //   %232 = tail call i32 @f32_add(i32 noundef %230, i32 noundef %231) #10
+    //   %232 = tail call i32 @f32_add(i32 noundef %230, i32 noundef %231) #9
     Value *val232 = builder.CreateCall(funcf32_add, {val230, val231});
     //   %233 = and i32 %227, 2139095040
     Value *val233 = builder.CreateAnd(val227, builder.getInt32(2139095040), "");
@@ -3406,17 +3399,17 @@ int main(int argc, char* argv[]) {
     PHINode *val282 = builder.CreatePHI(Type::getInt32Ty(context), 6);
     //   %283 = phi i32 [ %192, %f32_less.exit4 ], [ %281, %f32_less.exit5 ], [ %192, %253 ], [ %192, %238 ], [ %192, %f32_less.exit2.thread ], [ %192, %250 ]
     PHINode *val283 = builder.CreatePHI(Type::getInt32Ty(context), 6);
-    //   %284 = tail call i32 @f32_mul(i32 noundef %9, i32 noundef %283) #10
+    //   %284 = tail call i32 @f32_mul(i32 noundef %9, i32 noundef %283) #9
     Value *val284 = builder.CreateCall(funcf32_mul, {val9, val283});
-    //   %285 = tail call i32 @f32_add(i32 noundef %27, i32 noundef %284) #10
+    //   %285 = tail call i32 @f32_add(i32 noundef %27, i32 noundef %284) #9
     Value *val285 = builder.CreateCall(funcf32_add, {val27, val284});
-    //   %286 = tail call i32 @f32_mul(i32 noundef %10, i32 noundef %283) #10
+    //   %286 = tail call i32 @f32_mul(i32 noundef %10, i32 noundef %283) #9
     Value *val286 = builder.CreateCall(funcf32_mul, {val10, val283});
-    //   %287 = tail call i32 @f32_add(i32 noundef %26, i32 noundef %286) #10
+    //   %287 = tail call i32 @f32_add(i32 noundef %26, i32 noundef %286) #9
     Value *val287 = builder.CreateCall(funcf32_add, {val26, val286});
-    //   %288 = tail call i32 @f32_mul(i32 noundef %11, i32 noundef %283) #10
+    //   %288 = tail call i32 @f32_mul(i32 noundef %11, i32 noundef %283) #9
     Value *val288 = builder.CreateCall(funcf32_mul, {val11, val283});
-    //   %289 = tail call i32 @f32_add(i32 noundef %25, i32 noundef %288) #10
+    //   %289 = tail call i32 @f32_add(i32 noundef %25, i32 noundef %288) #9
     Value *val289 = builder.CreateCall(funcf32_add, {val25, val288});
     //   br label %290
     builder.CreateBr(val290);
@@ -3697,25 +3690,25 @@ int main(int argc, char* argv[]) {
     Value *val412 = builder.CreateSelect(val410, val411, val289);
     //   %413 = tail call i32 @f32_add(i32 noundef %405, i32 noundef %412)
     Value *val413 = builder.CreateCall(funcf32_add, {val405, val412});
-    //   %414 = tail call i32 @f32_mul(i32 noundef %393, i32 noundef %393) #10
+    //   %414 = tail call i32 @f32_mul(i32 noundef %393, i32 noundef %393) #9
     Value *val414 = builder.CreateCall(funcf32_mul, {val393, val393});
-    //   %415 = tail call i32 @f32_mul(i32 noundef %403, i32 noundef %403) #10
+    //   %415 = tail call i32 @f32_mul(i32 noundef %403, i32 noundef %403) #9
     Value *val415 = builder.CreateCall(funcf32_mul, {val403, val403});
-    //   %416 = tail call i32 @f32_add(i32 noundef %414, i32 noundef %415) #10
+    //   %416 = tail call i32 @f32_add(i32 noundef %414, i32 noundef %415) #9
     Value *val416 = builder.CreateCall(funcf32_add, {val414, val415});
-    //   %417 = tail call i32 @f32_mul(i32 noundef %413, i32 noundef %413) #10
+    //   %417 = tail call i32 @f32_mul(i32 noundef %413, i32 noundef %413) #9
     Value *val417 = builder.CreateCall(funcf32_mul, {val413, val413});
-    //   %418 = tail call i32 @f32_add(i32 noundef %416, i32 noundef %417) #10
+    //   %418 = tail call i32 @f32_add(i32 noundef %416, i32 noundef %417) #9
     Value *val418 = builder.CreateCall(funcf32_add, {val416, val417});
-    //   %419 = tail call i32 @f32_div(i32 noundef %418, i32 noundef 1073741824) #10
+    //   %419 = tail call i32 @f32_div(i32 noundef %418, i32 noundef 1073741824) #9
     Value *val419 = builder.CreateCall(funcf32_div, {val418, builder.getInt32(1073741824)});
     //   %420 = lshr i32 %418, 1
     Value *val420 = builder.CreateLShr(val418, builder.getInt32(1), "", false);
     //   %421 = sub nsw i32 1597463007, %420
     Value *val421 = builder.CreateSub(builder.getInt32(1597463007), val420, "", false, true);
-    //   %422 = tail call i32 @f32_mul(i32 noundef %421, i32 noundef %421) #10
+    //   %422 = tail call i32 @f32_mul(i32 noundef %421, i32 noundef %421) #9
     Value *val422 = builder.CreateCall(funcf32_mul, {val421, val421});
-    //   %423 = tail call i32 @f32_mul(i32 noundef %419, i32 noundef %422) #10
+    //   %423 = tail call i32 @f32_mul(i32 noundef %419, i32 noundef %422) #9
     Value *val423 = builder.CreateCall(funcf32_mul, {val419, val422});
     //   %424 = and i32 %423, 2139095040
     Value *val424 = builder.CreateAnd(val423, builder.getInt32(2139095040), "");
@@ -3733,27 +3726,27 @@ int main(int argc, char* argv[]) {
     Value *val430 = builder.CreateSelect(val428, val429, val423);
     //   %431 = tail call i32 @f32_add(i32 noundef 1069547520, i32 noundef %430)
     Value *val431 = builder.CreateCall(funcf32_add, {builder.getInt32(1069547520), val430});
-    //   %432 = tail call i32 @f32_mul(i32 noundef %421, i32 noundef %431) #10
+    //   %432 = tail call i32 @f32_mul(i32 noundef %421, i32 noundef %431) #9
     Value *val432 = builder.CreateCall(funcf32_mul, {val421, val431});
-    //   %433 = tail call i32 @f32_mul(i32 noundef %393, i32 noundef %432) #10
+    //   %433 = tail call i32 @f32_mul(i32 noundef %393, i32 noundef %432) #9
     Value *val433 = builder.CreateCall(funcf32_mul, {val393, val432});
-    //   %434 = tail call i32 @f32_mul(i32 noundef %403, i32 noundef %432) #10
+    //   %434 = tail call i32 @f32_mul(i32 noundef %403, i32 noundef %432) #9
     Value *val434 = builder.CreateCall(funcf32_mul, {val403, val432});
-    //   %435 = tail call i32 @f32_mul(i32 noundef %413, i32 noundef %432) #10
+    //   %435 = tail call i32 @f32_mul(i32 noundef %413, i32 noundef %432) #9
     Value *val435 = builder.CreateCall(funcf32_mul, {val413, val432});
-    //   %436 = tail call i32 @f32_mul(i32 noundef %9, i32 noundef %433) #10
+    //   %436 = tail call i32 @f32_mul(i32 noundef %9, i32 noundef %433) #9
     Value *val436 = builder.CreateCall(funcf32_mul, {val9, val433});
-    //   %437 = tail call i32 @f32_mul(i32 noundef %10, i32 noundef %434) #10
+    //   %437 = tail call i32 @f32_mul(i32 noundef %10, i32 noundef %434) #9
     Value *val437 = builder.CreateCall(funcf32_mul, {val10, val434});
-    //   %438 = tail call i32 @f32_add(i32 noundef %436, i32 noundef %437) #10
+    //   %438 = tail call i32 @f32_add(i32 noundef %436, i32 noundef %437) #9
     Value *val438 = builder.CreateCall(funcf32_add, {val436, val437});
-    //   %439 = tail call i32 @f32_mul(i32 noundef %11, i32 noundef %435) #10
+    //   %439 = tail call i32 @f32_mul(i32 noundef %11, i32 noundef %435) #9
     Value *val439 = builder.CreateCall(funcf32_mul, {val11, val435});
-    //   %440 = tail call i32 @f32_add(i32 noundef %438, i32 noundef %439) #10
+    //   %440 = tail call i32 @f32_add(i32 noundef %438, i32 noundef %439) #9
     Value *val440 = builder.CreateCall(funcf32_add, {val438, val439});
-    //   %441 = tail call i32 @f32_mul(i32 noundef 1073741824, i32 noundef %440) #10
+    //   %441 = tail call i32 @f32_mul(i32 noundef 1073741824, i32 noundef %440) #9
     Value *val441 = builder.CreateCall(funcf32_mul, {builder.getInt32(1073741824), val440});
-    //   %442 = tail call i32 @f32_mul(i32 noundef %441, i32 noundef %433) #10
+    //   %442 = tail call i32 @f32_mul(i32 noundef %441, i32 noundef %433) #9
     Value *val442 = builder.CreateCall(funcf32_mul, {val441, val433});
     //   %443 = and i32 %442, 2139095040
     Value *val443 = builder.CreateAnd(val442, builder.getInt32(2139095040), "");
@@ -3771,7 +3764,7 @@ int main(int argc, char* argv[]) {
     Value *val449 = builder.CreateSelect(val447, val448, val442);
     //   %450 = tail call i32 @f32_add(i32 noundef %9, i32 noundef %449)
     Value *val450 = builder.CreateCall(funcf32_add, {val9, val449});
-    //   %451 = tail call i32 @f32_mul(i32 noundef %441, i32 noundef %434) #10
+    //   %451 = tail call i32 @f32_mul(i32 noundef %441, i32 noundef %434) #9
     Value *val451 = builder.CreateCall(funcf32_mul, {val441, val434});
     //   %452 = and i32 %451, 2139095040
     Value *val452 = builder.CreateAnd(val451, builder.getInt32(2139095040), "");
@@ -3789,7 +3782,7 @@ int main(int argc, char* argv[]) {
     Value *val458 = builder.CreateSelect(val456, val457, val451);
     //   %459 = tail call i32 @f32_add(i32 noundef %10, i32 noundef %458)
     Value *val459 = builder.CreateCall(funcf32_add, {val10, val458});
-    //   %460 = tail call i32 @f32_mul(i32 noundef %441, i32 noundef %435) #10
+    //   %460 = tail call i32 @f32_mul(i32 noundef %441, i32 noundef %435) #9
     Value *val460 = builder.CreateCall(funcf32_mul, {val441, val435});
     //   %461 = and i32 %460, 2139095040
     Value *val461 = builder.CreateAnd(val460, builder.getInt32(2139095040), "");
@@ -4306,25 +4299,25 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valbuild_float_exit);
     //   %164 = phi i32 [ %163, %158 ], [ 2139095040, %148 ], [ %157, %154 ]
     PHINode *val164 = builder.CreatePHI(Type::getInt32Ty(context), 3);
-    //   %165 = tail call i32 @f32_mul(i32 noundef %67, i32 noundef %67) #10
+    //   %165 = tail call i32 @f32_mul(i32 noundef %67, i32 noundef %67) #9
     Value *val165 = builder.CreateCall(funcf32_mul, {val67, val67});
-    //   %166 = tail call i32 @f32_mul(i32 noundef %126, i32 noundef %126) #10
+    //   %166 = tail call i32 @f32_mul(i32 noundef %126, i32 noundef %126) #9
     Value *val166 = builder.CreateCall(funcf32_mul, {val126, val126});
-    //   %167 = tail call i32 @f32_add(i32 noundef %165, i32 noundef %166) #10
+    //   %167 = tail call i32 @f32_add(i32 noundef %165, i32 noundef %166) #9
     Value *val167 = builder.CreateCall(funcf32_add, {val165, val166});
-    //   %168 = tail call i32 @f32_mul(i32 noundef %164, i32 noundef %164) #10
+    //   %168 = tail call i32 @f32_mul(i32 noundef %164, i32 noundef %164) #9
     Value *val168 = builder.CreateCall(funcf32_mul, {val164, val164});
-    //   %169 = tail call i32 @f32_add(i32 noundef %167, i32 noundef %168) #10
+    //   %169 = tail call i32 @f32_add(i32 noundef %167, i32 noundef %168) #9
     Value *val169 = builder.CreateCall(funcf32_add, {val167, val168});
-    //   %170 = tail call i32 @f32_div(i32 noundef %169, i32 noundef 1073741824) #10
+    //   %170 = tail call i32 @f32_div(i32 noundef %169, i32 noundef 1073741824) #9
     Value *val170 = builder.CreateCall(funcf32_div, {val169, builder.getInt32(1073741824)});
     //   %171 = lshr i32 %169, 1
     Value *val171 = builder.CreateLShr(val169, builder.getInt32(1), "", false);
     //   %172 = sub nsw i32 1597463007, %171
     Value *val172 = builder.CreateSub(builder.getInt32(1597463007), val171, "", false, true);
-    //   %173 = tail call i32 @f32_mul(i32 noundef %172, i32 noundef %172) #10
+    //   %173 = tail call i32 @f32_mul(i32 noundef %172, i32 noundef %172) #9
     Value *val173 = builder.CreateCall(funcf32_mul, {val172, val172});
-    //   %174 = tail call i32 @f32_mul(i32 noundef %170, i32 noundef %173) #10
+    //   %174 = tail call i32 @f32_mul(i32 noundef %170, i32 noundef %173) #9
     Value *val174 = builder.CreateCall(funcf32_mul, {val170, val173});
     //   %175 = and i32 %174, 2139095040
     Value *val175 = builder.CreateAnd(val174, builder.getInt32(2139095040), "");
@@ -4342,13 +4335,13 @@ int main(int argc, char* argv[]) {
     Value *val181 = builder.CreateSelect(val179, val180, val174);
     //   %182 = tail call i32 @f32_add(i32 noundef 1069547520, i32 noundef %181)
     Value *val182 = builder.CreateCall(funcf32_add, {builder.getInt32(1069547520), val181});
-    //   %183 = tail call i32 @f32_mul(i32 noundef %172, i32 noundef %182) #10
+    //   %183 = tail call i32 @f32_mul(i32 noundef %172, i32 noundef %182) #9
     Value *val183 = builder.CreateCall(funcf32_mul, {val172, val182});
-    //   %184 = tail call i32 @f32_mul(i32 noundef %67, i32 noundef %183) #10
+    //   %184 = tail call i32 @f32_mul(i32 noundef %67, i32 noundef %183) #9
     Value *val184 = builder.CreateCall(funcf32_mul, {val67, val183});
-    //   %185 = tail call i32 @f32_mul(i32 noundef %126, i32 noundef %183) #10
+    //   %185 = tail call i32 @f32_mul(i32 noundef %126, i32 noundef %183) #9
     Value *val185 = builder.CreateCall(funcf32_mul, {val126, val183});
-    //   %186 = tail call i32 @f32_mul(i32 noundef %164, i32 noundef %183) #10
+    //   %186 = tail call i32 @f32_mul(i32 noundef %164, i32 noundef %183) #9
     Value *val186 = builder.CreateCall(funcf32_mul, {val164, val183});
     //   %187 = tail call i32 @ray_impl(ptr noundef %0, ptr noundef %1, ptr noundef %2, ptr noundef %3, ptr noundef %4, ptr noundef %5, i32 noundef 0, i32 noundef 0, i32 noundef 0, i32 noundef %184, i32 noundef %185, i32 noundef %186, i32 noundef 20, i32 noundef 10), !range !6
     Value *val187 = builder.CreateCall(funcray_impl, {val0, val1, val2, val3, val4, val5, builder.getInt32(0), builder.getInt32(0), builder.getInt32(0), val184, val185, val186, builder.getInt32(20), builder.getInt32(10)});
@@ -4547,17 +4540,17 @@ int main(int argc, char* argv[]) {
     Value *val5 = builder.CreateAlloca(ArrayType::get(Type::getInt32Ty(context), 3));
     //   %6 = alloca [500 x [500 x i32]], align 16
     Value *val6 = builder.CreateAlloca(ArrayType::get(ArrayType::get(Type::getInt32Ty(context), 500), 500));
-    //   call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %0) #10
+    //   call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %0) #9
     builder.CreateCall(funcllvm_lifetime_start_p0, {builder.getInt64(12ll), val0});
-    //   call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %1) #10
+    //   call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %1) #9
     builder.CreateCall(funcllvm_lifetime_start_p0, {builder.getInt64(12ll), val1});
-    //   call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %2) #10
+    //   call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %2) #9
     builder.CreateCall(funcllvm_lifetime_start_p0, {builder.getInt64(12ll), val2});
-    //   call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %3) #10
+    //   call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %3) #9
     builder.CreateCall(funcllvm_lifetime_start_p0, {builder.getInt64(12ll), val3});
-    //   call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %4) #10
+    //   call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %4) #9
     builder.CreateCall(funcllvm_lifetime_start_p0, {builder.getInt64(12ll), val4});
-    //   call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %5) #10
+    //   call void @llvm.lifetime.start.p0(i64 12, ptr nonnull %5) #9
     builder.CreateCall(funcllvm_lifetime_start_p0, {builder.getInt64(12ll), val5});
     //   store i32 -1041235968, ptr %0, align 4, !tbaa !4
     builder.CreateAlignedStore(builder.getInt32(-1041235968), val0, MaybeAlign(4));
@@ -4631,7 +4624,7 @@ int main(int argc, char* argv[]) {
     builder.Insert(val18);
     //   store i32 65280, ptr %18, align 4, !tbaa !4
     builder.CreateAlignedStore(builder.getInt32(65280), val18, MaybeAlign(4));
-    //   call void @llvm.lifetime.start.p0(i64 1000000, ptr nonnull %6) #10
+    //   call void @llvm.lifetime.start.p0(i64 1000000, ptr nonnull %6) #9
     builder.CreateCall(funcllvm_lifetime_start_p0, {builder.getInt64(1000000ll), val6});
     //   call void @llvm.memset.p0.i64(ptr noundef nonnull align 16 dereferenceable(1000000) %6, i8 0, i64 1000000, i1 false), !tbaa !4
     builder.CreateCall(funcllvm_memset_p0_i64, {val6, builder.getInt8(0), builder.getInt64(1000000ll), builder.getInt1(false)});
@@ -4665,19 +4658,19 @@ int main(int argc, char* argv[]) {
     //   br label %30
     builder.CreateBr(val30);
     builder.SetInsertPoint(val29);
-    //   call void @llvm.lifetime.end.p0(i64 1000000, ptr nonnull %6) #10
+    //   call void @llvm.lifetime.end.p0(i64 1000000, ptr nonnull %6) #9
     builder.CreateCall(funcllvm_lifetime_end_p0, {builder.getInt64(1000000ll), val6});
-    //   call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %5) #10
+    //   call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %5) #9
     builder.CreateCall(funcllvm_lifetime_end_p0, {builder.getInt64(12ll), val5});
-    //   call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %4) #10
+    //   call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %4) #9
     builder.CreateCall(funcllvm_lifetime_end_p0, {builder.getInt64(12ll), val4});
-    //   call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %3) #10
+    //   call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %3) #9
     builder.CreateCall(funcllvm_lifetime_end_p0, {builder.getInt64(12ll), val3});
-    //   call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %2) #10
+    //   call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %2) #9
     builder.CreateCall(funcllvm_lifetime_end_p0, {builder.getInt64(12ll), val2});
-    //   call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %1) #10
+    //   call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %1) #9
     builder.CreateCall(funcllvm_lifetime_end_p0, {builder.getInt64(12ll), val1});
-    //   call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %0) #10
+    //   call void @llvm.lifetime.end.p0(i64 12, ptr nonnull %0) #9
     builder.CreateCall(funcllvm_lifetime_end_p0, {builder.getInt64(12ll), val0});
     //   ret void
     builder.CreateRetVoid();
@@ -5005,25 +4998,25 @@ int main(int argc, char* argv[]) {
     builder.SetInsertPoint(valbuild_float_exit10);
     //   %171 = phi i32 [ %170, %165 ], [ 2139095040, %155 ], [ %164, %161 ]
     PHINode *val171 = builder.CreatePHI(Type::getInt32Ty(context), 3);
-    //   %172 = tail call i32 @f32_mul(i32 noundef %75, i32 noundef %75) #10
+    //   %172 = tail call i32 @f32_mul(i32 noundef %75, i32 noundef %75) #9
     Value *val172 = builder.CreateCall(funcf32_mul, {val75, val75});
-    //   %173 = tail call i32 @f32_mul(i32 noundef %133, i32 noundef %133) #10
+    //   %173 = tail call i32 @f32_mul(i32 noundef %133, i32 noundef %133) #9
     Value *val173 = builder.CreateCall(funcf32_mul, {val133, val133});
-    //   %174 = tail call i32 @f32_add(i32 noundef %172, i32 noundef %173) #10
+    //   %174 = tail call i32 @f32_add(i32 noundef %172, i32 noundef %173) #9
     Value *val174 = builder.CreateCall(funcf32_add, {val172, val173});
-    //   %175 = tail call i32 @f32_mul(i32 noundef %171, i32 noundef %171) #10
+    //   %175 = tail call i32 @f32_mul(i32 noundef %171, i32 noundef %171) #9
     Value *val175 = builder.CreateCall(funcf32_mul, {val171, val171});
-    //   %176 = tail call i32 @f32_add(i32 noundef %174, i32 noundef %175) #10
+    //   %176 = tail call i32 @f32_add(i32 noundef %174, i32 noundef %175) #9
     Value *val176 = builder.CreateCall(funcf32_add, {val174, val175});
-    //   %177 = tail call i32 @f32_div(i32 noundef %176, i32 noundef 1073741824) #10
+    //   %177 = tail call i32 @f32_div(i32 noundef %176, i32 noundef 1073741824) #9
     Value *val177 = builder.CreateCall(funcf32_div, {val176, builder.getInt32(1073741824)});
     //   %178 = lshr i32 %176, 1
     Value *val178 = builder.CreateLShr(val176, builder.getInt32(1), "", false);
     //   %179 = sub nsw i32 1597463007, %178
     Value *val179 = builder.CreateSub(builder.getInt32(1597463007), val178, "", false, true);
-    //   %180 = tail call i32 @f32_mul(i32 noundef %179, i32 noundef %179) #10
+    //   %180 = tail call i32 @f32_mul(i32 noundef %179, i32 noundef %179) #9
     Value *val180 = builder.CreateCall(funcf32_mul, {val179, val179});
-    //   %181 = tail call i32 @f32_mul(i32 noundef %177, i32 noundef %180) #10
+    //   %181 = tail call i32 @f32_mul(i32 noundef %177, i32 noundef %180) #9
     Value *val181 = builder.CreateCall(funcf32_mul, {val177, val180});
     //   %182 = and i32 %181, 2139095040
     Value *val182 = builder.CreateAnd(val181, builder.getInt32(2139095040), "");
@@ -5041,13 +5034,13 @@ int main(int argc, char* argv[]) {
     Value *val188 = builder.CreateSelect(val186, val187, val181);
     //   %189 = tail call i32 @f32_add(i32 noundef 1069547520, i32 noundef %188)
     Value *val189 = builder.CreateCall(funcf32_add, {builder.getInt32(1069547520), val188});
-    //   %190 = tail call i32 @f32_mul(i32 noundef %179, i32 noundef %189) #10
+    //   %190 = tail call i32 @f32_mul(i32 noundef %179, i32 noundef %189) #9
     Value *val190 = builder.CreateCall(funcf32_mul, {val179, val189});
-    //   %191 = tail call i32 @f32_mul(i32 noundef %75, i32 noundef %190) #10
+    //   %191 = tail call i32 @f32_mul(i32 noundef %75, i32 noundef %190) #9
     Value *val191 = builder.CreateCall(funcf32_mul, {val75, val190});
-    //   %192 = tail call i32 @f32_mul(i32 noundef %133, i32 noundef %190) #10
+    //   %192 = tail call i32 @f32_mul(i32 noundef %133, i32 noundef %190) #9
     Value *val192 = builder.CreateCall(funcf32_mul, {val133, val190});
-    //   %193 = tail call i32 @f32_mul(i32 noundef %171, i32 noundef %190) #10
+    //   %193 = tail call i32 @f32_mul(i32 noundef %171, i32 noundef %190) #9
     Value *val193 = builder.CreateCall(funcf32_mul, {val171, val190});
     //   %194 = call i32 @ray_impl(ptr noundef nonnull %0, ptr noundef nonnull %1, ptr noundef nonnull %2, ptr noundef nonnull %3, ptr noundef nonnull %4, ptr noundef nonnull %5, i32 noundef 0, i32 noundef 0, i32 noundef 0, i32 noundef %191, i32 noundef %192, i32 noundef %193, i32 noundef 20, i32 noundef 10), !range !10
     Value *val194 = builder.CreateCall(funcray_impl, {val0, val1, val2, val3, val4, val5, builder.getInt32(0), builder.getInt32(0), builder.getInt32(0), val191, val192, val193, builder.getInt32(20), builder.getInt32(10)});
@@ -5074,7 +5067,7 @@ int main(int argc, char* argv[]) {
     //   br label %208
     builder.CreateBr(val208);
     builder.SetInsertPoint(val202);
-    //   tail call void (...) @simFlush() #10
+    //   tail call void (...) @simFlush() #9
     builder.CreateCall(funcsimFlush, {});
     //   %203 = add nuw nsw i64 %20, 1
     Value *val203 = builder.CreateAdd(val20, builder.getInt64(1ll), "", true, true);
@@ -5099,7 +5092,7 @@ int main(int argc, char* argv[]) {
     Value *val211 = builder.CreateAlignedLoad(Type::getInt32Ty(context), val210, MaybeAlign(4));
     //   %212 = trunc i64 %209 to i32
     Value *val212 = builder.CreateTrunc(val209, Type::getInt32Ty(context));
-    //   tail call void @simPutPixel(i32 noundef %201, i32 noundef %212, i32 noundef %211) #10
+    //   tail call void @simPutPixel(i32 noundef %201, i32 noundef %212, i32 noundef %211) #9
     builder.CreateCall(funcsimPutPixel, {val201, val212, val211});
     //   %213 = add nuw nsw i64 %209, 1
     Value *val213 = builder.CreateAdd(val209, builder.getInt64(1ll), "", true, true);
@@ -6768,19 +6761,6 @@ int main(int argc, char* argv[]) {
     val60->addIncoming(val58, val55);
     val60->addIncoming(builder.getInt32(0), val1);
   }
-  {
-    Function *func = funcmain;
-    BasicBlock *val0 = BasicBlock::Create(context, "", func);
-    builder.SetInsertPoint(val0);
-    //   tail call void (...) @simInit() #10
-    builder.CreateCall(funcsimInit, {});
-    //   tail call void @app() #10
-    builder.CreateCall(funcapp, {});
-    //   tail call void (...) @simExit() #10
-    builder.CreateCall(funcsimExit, {});
-    //   ret i32 0
-    builder.CreateRet(builder.getInt32(0));
-  }
   if (std::string(argv[1]) == PRINT) {
     module->print(outs(), nullptr);
     return 0;
@@ -6789,12 +6769,6 @@ int main(int argc, char* argv[]) {
     LLVMInitializeNativeAsmPrinter();
     ExecutionEngine *ee = EngineBuilder(std::unique_ptr<Module>(module)).create();
     ee->InstallLazyFunctionCreator([=](const std::string &fnName) -> void * {
-      if (fnName == "simInit") {
-        return reinterpret_cast<void *>(simInit);
-      }
-      if (fnName == "simExit") {
-        return reinterpret_cast<void *>(simExit);
-      }
       if (fnName == "simPutPixel") {
         return reinterpret_cast<void *>(simPutPixel);
       }
@@ -6804,7 +6778,9 @@ int main(int argc, char* argv[]) {
       return nullptr;
     });
     ee->finalizeObject();
-    ee->runFunction(funcmain, {});
+    simInit();
+    ee->runFunction(funcapp, {});
+    simExit();
     return 0;
   }
 }

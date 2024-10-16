@@ -1265,64 +1265,6 @@ define i32 @f32_from_ll(i64 noundef %0) local_unnamed_addr #4 {
 ; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
 declare i64 @llvm.abs.i64(i64, i1 immarg) #6
 
-; Function Attrs: nounwind sspstrong uwtable
-define i32 @f32_sin(i32 noundef %0) local_unnamed_addr #0 {
-  %2 = tail call i32 @f32_mul(i32 noundef %0, i32 noundef %0) #7
-  br label %4
-
-3:                                                ; preds = %4
-  ret i32 %9
-
-4:                                                ; preds = %4, %1
-  %5 = phi i32 [ 0, %1 ], [ %16, %4 ]
-  %6 = phi i32 [ 1065353216, %1 ], [ %13, %4 ]
-  %7 = phi i32 [ %0, %1 ], [ %15, %4 ]
-  %8 = phi i32 [ 0, %1 ], [ %9, %4 ]
-  %9 = tail call i32 @f32_add(i32 noundef %8, i32 noundef %7) #7
-  %10 = tail call i32 @f32_mul(i32 noundef %7, i32 noundef %2) #7
-  %11 = tail call i32 @f32_add(i32 noundef %6, i32 noundef 1065353216) #7
-  %12 = tail call i32 @f32_div(i32 noundef %10, i32 noundef %11) #7
-  %13 = tail call i32 @f32_add(i32 noundef %11, i32 noundef 1065353216) #7
-  %14 = tail call i32 @f32_div(i32 noundef %12, i32 noundef %13) #7
-  %15 = tail call i32 @f32_negate(i32 noundef %14) #7
-  %16 = add nuw nsw i32 %5, 1
-  %17 = icmp eq i32 %16, 100
-  br i1 %17, label %3, label %4, !llvm.loop !19
-}
-
-; Function Attrs: nounwind sspstrong uwtable
-define i32 @f32_cos(i32 noundef %0) local_unnamed_addr #0 {
-  %2 = tail call i32 @f32_mul(i32 noundef %0, i32 noundef %0) #7
-  br label %4
-
-3:                                                ; preds = %4
-  ret i32 %9
-
-4:                                                ; preds = %4, %1
-  %5 = phi i32 [ 0, %1 ], [ %16, %4 ]
-  %6 = phi i32 [ 0, %1 ], [ %13, %4 ]
-  %7 = phi i32 [ 1065353216, %1 ], [ %15, %4 ]
-  %8 = phi i32 [ 0, %1 ], [ %9, %4 ]
-  %9 = tail call i32 @f32_add(i32 noundef %8, i32 noundef %7) #7
-  %10 = tail call i32 @f32_mul(i32 noundef %7, i32 noundef %2) #7
-  %11 = tail call i32 @f32_add(i32 noundef %6, i32 noundef 1065353216) #7
-  %12 = tail call i32 @f32_div(i32 noundef %10, i32 noundef %11) #7
-  %13 = tail call i32 @f32_add(i32 noundef %11, i32 noundef 1065353216) #7
-  %14 = tail call i32 @f32_div(i32 noundef %12, i32 noundef %13) #7
-  %15 = tail call i32 @f32_negate(i32 noundef %14) #7
-  %16 = add nuw nsw i32 %5, 1
-  %17 = icmp eq i32 %16, 100
-  br i1 %17, label %3, label %4, !llvm.loop !20
-}
-
-; Function Attrs: nounwind sspstrong uwtable
-define i32 @f32_tan(i32 noundef %0) local_unnamed_addr #0 {
-  %2 = tail call i32 @f32_sin(i32 noundef %0)
-  %3 = tail call i32 @f32_cos(i32 noundef %0)
-  %4 = tail call i32 @f32_div(i32 noundef %2, i32 noundef %3) #7
-  ret i32 %4
-}
-
 attributes #0 = { nounwind sspstrong uwtable "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="4" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" "zero-call-used-regs"="used-gpr" }
 attributes #1 = { nocallback nofree nosync nounwind willreturn memory(argmem: readwrite) }
 attributes #2 = { nocallback nofree nounwind willreturn memory(argmem: write) }
@@ -1332,7 +1274,7 @@ attributes #5 = { mustprogress nofree norecurse nosync nounwind sspstrong willre
 attributes #6 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
 attributes #7 = { nounwind }
 
-!llvm.ident = !{!0, !0, !0}
+!llvm.ident = !{!0, !0}
 !llvm.module.flags = !{!1, !2, !3}
 
 !0 = !{!"clang version 18.1.8"}
@@ -1354,5 +1296,3 @@ attributes #7 = { nounwind }
 !16 = distinct !{!16, !10}
 !17 = distinct !{!17, !10}
 !18 = distinct !{!18, !10}
-!19 = distinct !{!19, !10}
-!20 = distinct !{!20, !10}

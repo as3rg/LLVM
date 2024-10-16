@@ -138,13 +138,9 @@ struct CustomPass : public PassInfoMixin<CustomPass> {
     addLine(0, global.header, "#include \"llvm/IR/IRBuilder.h\"");
     addLine(0, global.header, "#include \"llvm/IR/LLVMContext.h\"");
     addLine(0, global.header, "#include \"llvm/IR/Module.h\"");
+    addLine(0, global.header, "#include \"app/sim.h\"");
     addLine(0, global.header, "#include <array>");
     addLine(0, global.header, "#include <string>");
-    addLine(0, global.header, "");
-    addLine(0, global.header, "void simInit();");
-    addLine(0, global.header, "void simExit();");
-    addLine(0, global.header, "void simFlush();");
-    addLine(0, global.header, "void simPutPixel(int x, int y, int argb);");
     addLine(0, global.header, "");
     addLine(0, global.header, "using namespace llvm;");
     addLine(0, global.header, "");
@@ -174,12 +170,6 @@ struct CustomPass : public PassInfoMixin<CustomPass> {
     addLine(2, global.footer,
             "ee->InstallLazyFunctionCreator([=](const std::string &fnName) -> "
             "void * {");
-    addLine(3, global.footer, "if (fnName == \"simInit\") {");
-    addLine(4, global.footer, "return reinterpret_cast<void *>(simInit);");
-    addLine(3, global.footer, "}");
-    addLine(3, global.footer, "if (fnName == \"simExit\") {");
-    addLine(4, global.footer, "return reinterpret_cast<void *>(simExit);");
-    addLine(3, global.footer, "}");
     addLine(3, global.footer, "if (fnName == \"simPutPixel\") {");
     addLine(4, global.footer, "return reinterpret_cast<void *>(simPutPixel);");
     addLine(3, global.footer, "}");
@@ -189,7 +179,9 @@ struct CustomPass : public PassInfoMixin<CustomPass> {
     addLine(3, global.footer, "return nullptr;");
     addLine(2, global.footer, "});");
     addLine(2, global.footer, "ee->finalizeObject();");
-    addLine(2, global.footer, "ee->runFunction(funcmain, {});");
+    addLine(2, global.footer, "simInit();");
+    addLine(2, global.footer, "ee->runFunction(funcapp, {});");
+    addLine(2, global.footer, "simExit();");
     addLine(2, global.footer, "return 0;");
     addLine(1, global.footer, "}");
     addLine(0, global.footer, "}");

@@ -5,5 +5,3 @@ void simFlush();
 void simPutPixel(int x, int y, int argb);
 void simInit();
 void simExit();
-
-extern void app();
