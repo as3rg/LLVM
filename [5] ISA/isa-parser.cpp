@@ -65,7 +65,6 @@ ArgType get_type(const std::string& line) {
   return ArgType::NONE;
 }
 
-// TODO: rewrite
 template <typename T>
 T* parse_op(isa::CPU& cpu, const std::string& line, std::string current_function, std::string current_label) {
   if (std::regex_search(line, matches, register_regex)) {
@@ -329,8 +328,6 @@ std::vector<std::string> split_args(const std::string& str) {
   }
 
 int parse(isa::CPU& cpu, const std::vector<std::string>& lines) {
-
-  isa::Runnable* next = nullptr;
   std::string current_function;
   std::string current_label;
 
@@ -348,12 +345,8 @@ int parse(isa::CPU& cpu, const std::vector<std::string>& lines) {
       current_function = name;
 
       cpu.labels[current_function].clear();
-      current_label = "";
-
-      next = f;
     } else if (std::regex_search(line, matches, label_regex)) {
-      ASSERT_FALSE(next == nullptr, std::format("{}: function declaration expected before the instruction", line_num));
-
+      ASSERT_FALSE(current_function.empty(), std::format("{}: function declaration expected before the instruction", line_num));
       std::string name = matches[1];
       isa::Label* label = cpu.allocate(isa::Label(name));
       name = label->str();
@@ -361,11 +354,10 @@ int parse(isa::CPU& cpu, const std::vector<std::string>& lines) {
       ASSERT_FALSE(cpu.labels[current_function].contains(name),
                    std::format("{}: label {} already exists in function {}", line_num, name, current_function));
       cpu.labels[current_function][name] = label;
-      current_label = name;
-
-      next = next->next = label;
     }
   }
+
+  isa::Runnable* next = nullptr;
 
   for (size_t line_num = 0; line_num < lines.size(); ++line_num) {
     std::string line = lines[line_num];
@@ -377,7 +369,10 @@ int parse(isa::CPU& cpu, const std::vector<std::string>& lines) {
       current_function = name;
       current_label = "";
 
-      next = cpu.functions[current_function];
+      //TODO: fix
+      isa::Runnable* nop = cpu.allocate(isa::Nop());
+      cpu.functions[current_function]->next = nop;
+      next = nop;
     } else if (std::regex_search(line, matches, comment_regex)) {
     } else if (std::regex_search(line, matches, label_regex)) {
       ASSERT_FALSE(next == nullptr, std::format("{}: function declaration expected before the instruction", line_num));
@@ -398,8 +393,6 @@ int parse(isa::CPU& cpu, const std::vector<std::string>& lines) {
         next = next->next = parse_binary_op<isa::Sub>(cpu, args, current_function, current_label);
       } else if (name == "mul") {
         next = next->next = parse_binary_op<isa::Mul>(cpu, args, current_function, current_label);
-      } else if (name == "umul") {
-        next = next->next = parse_binary_op<isa::UMul>(cpu, args, current_function, current_label);
       } else if (name == "div") {
         next = next->next =
             run<1, isa::Runnable*>(([&]<typename T>(Pack<T>) -> isa::Runnable* {
@@ -450,10 +443,6 @@ int parse(isa::CPU& cpu, const std::vector<std::string>& lines) {
         next = next->next = parse_shift<isa::RShL>(cpu, args, current_function, current_label);
       } else if (name == "rsha") {
         next = next->next = parse_shift<isa::RShA>(cpu, args, current_function, current_label);
-      } else if (name == "inv") {
-        next = next->next = parse_unary_op<isa::Inv>(cpu, args, current_function, current_label);
-      } else if (name == "not") {
-        next = next->next = parse_unary_op<isa::Not>(cpu, args, current_function, current_label);
       } else if (name == "eq") {
         next = next->next = parse_logical<isa::Eq>(cpu, args, current_function, current_label);
       } else if (name == "neq") {
@@ -475,7 +464,7 @@ int parse(isa::CPU& cpu, const std::vector<std::string>& lines) {
                                       return nullptr;
                                     }
                                     auto* cond = parse_op<isa::Value<CT>>(cpu, args[0], current_function, current_label);
-                                    auto* res = parse_op<isa::Dest<T>>(cpu, args[1], current_function, current_label);
+                                    auto* res = parse_op<isa::DestValue<T>>(cpu, args[1], current_function, current_label);
                                     auto* op = parse_op<isa::Value<T>>(cpu, args[2], current_function, current_label);
                                     if (!cond || !res || !op) {
                                       return nullptr;
