@@ -74,7 +74,7 @@ isa::Runnable* isa::Label::run(CPU& cpu) {
   return next;
 }
 
-isa::Runnable* isa::LocalFunction::run(CPU& cpu) {
+isa::Runnable* isa::Function::run(CPU& cpu) {
   return next;
 }
 
@@ -179,11 +179,20 @@ void isa::Drw::compile(LLVMFuncContext* context) {
 }
 
 llvm::Function* isa::Function::compile_as_value(LLVMFuncContext* context) {
-  return context->global->functions[str()];
+  auto& func = context->global->functions[str()];
+  if (!func) {
+    std::vector<llvm::Type *> args_vec;
+    auto* int64Ty = llvm::Type::getInt64Ty(context->global->builder->getContext());
+    for (size_t i = 0; i < args(); ++i) {
+      args_vec.push_back(int64Ty);
+    }
+    func = llvm::Function::Create(llvm::FunctionType::get(int64Ty, args_vec, false), llvm::Function::ExternalLinkage, name(), context->global->module);
+  }
+  return func;
 }
 
 void isa::Label::compile(LLVMFuncContext* context) {
-  llvm::BasicBlock* next_block = context->global->blocks[context->func->str()][str()];
+  llvm::BasicBlock* next_block = compile_as_value(context);
   if (!context->jumped) {
     context->global->builder->CreateBr(next_block);
   }
@@ -193,20 +202,26 @@ void isa::Label::compile(LLVMFuncContext* context) {
 }
 
 llvm::BasicBlock* isa::Label::compile_as_value(LLVMFuncContext* context) {
-  return context->global->blocks[context->func->str()][str()];
+  auto* func = context->func;
+  auto& block = context->global->blocks[func->str()][str()];
+  if (!block) {
+    block = llvm::BasicBlock::Create(context->global->builder->getContext(), "", func->compile_as_value(context));
+  }
+  return block;
 }
 
-llvm::Function* isa::LocalFunction::compile(LLVMContext* context) {
+llvm::Function* isa::Function::compile(LLVMContext* context) {
   auto* builder = context->builder;
-  llvm::BasicBlock* block = context->blocks[str()][""];
-  builder->SetInsertPoint(block);
+  LLVMFuncContext cxt{context, {}, this};
+  llvm::Function* func = compile_as_value(&cxt);
 
-  LLVMFuncContext cxt{context, {}, this, block};
+  llvm::BasicBlock* block = llvm::BasicBlock::Create(builder->getContext(), "", func);
+  cxt.block = block;
+  builder->SetInsertPoint(block);
 
   for (size_t i = 0; i < isa::REG_CNT; ++i) {
     cxt.registers[i] = builder->CreateAlloca(llvm::Type::getInt64Ty(builder->getContext()));
   }
-  llvm::Function* func = compile_as_value(&cxt);
 
   for (size_t i = 0; i < args(); ++i) {
     llvm::Type* type = helpers::getType<W64_t>(builder);

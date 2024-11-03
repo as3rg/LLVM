@@ -76,8 +76,8 @@ int main(int argc, char* argv[]) {
         llvm::outs() << next->str() << "\n";
       }
       llvm::outs() << "\n";
-      return 0;  
     }
+    return 0;  
   } else if (argv[1] == RUN_ISA) {
     isa::Function* func = cpu.functions["#app(0)"];
     if (!func) {
@@ -97,21 +97,8 @@ int main(int argc, char* argv[]) {
   isa::LLVMContext cxt{&builder, module, {}, {}};
 
   for (auto [fname, func] : cpu.functions) {
-    std::vector<llvm::Type *> args;
-    for (size_t i = 0; i < func->args(); ++i) {
-      args.push_back(llvm::Type::getInt64Ty(context));
-    }
-    llvm::Function* llvmfunc = cxt.functions[fname] = llvm::Function::Create(llvm::FunctionType::get(llvm::Type::getInt64Ty(context), args, false), llvm::Function::ExternalLinkage, func->name(), module);
-    cxt.blocks[fname][""] = llvm::BasicBlock::Create(context, "", llvmfunc);
-    for (auto [lname, lbl] : cpu.labels[fname]) {
-      cxt.blocks[fname][lname] = llvm::BasicBlock::Create(context, lbl->name(), llvmfunc);
-    }
-  }
-
-  for (auto [fname, func] : cpu.functions) {
     func->compile(&cxt);
   }
-
   
   if (argv[1] == PRINT_IR) {
     module->print(llvm::outs(), nullptr);

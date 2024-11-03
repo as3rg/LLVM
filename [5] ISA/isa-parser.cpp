@@ -179,7 +179,17 @@ T* parse_op(isa::CPU& cpu, const std::string& line, std::string current_function
     if constexpr (std::is_base_of_v<T, isa::Function>) {
       std::string name = matches[1];
       size_t args_cnt = std::stoull(matches[2]);
-      return cpu.functions[isa::LocalFunction(name, args_cnt).str()];
+      auto f = isa::Function(name, args_cnt);
+      name = f.str();
+      if (cpu.functions.contains(name)) {
+        return cpu.functions[name];
+      } else {
+        auto& exfunc = cpu.external_functions[name];
+        if (!exfunc) {
+          exfunc = cpu.allocate(std::move(f));
+        }
+        return exfunc;
+      }
     } else {
       return nullptr;
     }
@@ -337,14 +347,14 @@ int parse(isa::CPU& cpu, const std::vector<std::string>& lines) {
       std::string name = matches[1];
       size_t args_cnt = std::stoull(matches[2]);
 
-      isa::Function* f = cpu.allocate(isa::LocalFunction(name, args_cnt));
+      isa::Function* f = cpu.allocate(isa::Function(name, args_cnt));
       name = f->str();
 
       ASSERT_FALSE(cpu.functions.contains(name), std::format("{}: function {} already exists", line_num, name));
       cpu.functions[name] = f;
       current_function = name;
 
-      cpu.labels[current_function].clear();
+      cpu.labels[current_function] = {};
     } else if (std::regex_search(line, matches, label_regex)) {
       ASSERT_FALSE(current_function.empty(), std::format("{}: function declaration expected before the instruction", line_num));
       std::string name = matches[1];
@@ -365,7 +375,7 @@ int parse(isa::CPU& cpu, const std::vector<std::string>& lines) {
       std::string name = matches[1];
       size_t args_cnt = std::stoull(matches[2]);
 
-      name = isa::LocalFunction(name, args_cnt).str();
+      name = isa::Function(name, args_cnt).str();
       current_function = name;
       current_label = "";
 

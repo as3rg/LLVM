@@ -1,11 +1,8 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <format>
-#include <functional>
 #include <map>
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -171,6 +168,7 @@ public:
   std::vector<std::unique_ptr<ISAObject>> allocated;
   std::vector<CallFrame> callstack;
   std::unordered_map<std::string, Function*> functions;
+  std::unordered_map<std::string, Function*> external_functions;
   std::unordered_map<std::string, std::map<std::string, Label*>> labels;
 
   CPU();
@@ -282,16 +280,9 @@ public:
 
   size_t args();
 
-  virtual Runnable* run(CPU& cpu) = 0;
+  Runnable* run(CPU& cpu);
 
-  virtual llvm::Function* compile_as_value(LLVMFuncContext* context);
-};
-
-class LocalFunction : public Function {
-public:
-  LocalFunction(std::string name, size_t args_cnt) : Function(std::move(name), args_cnt) {}
-
-  Runnable* run(CPU& cpu) override;
+  llvm::Function* compile_as_value(LLVMFuncContext* context);
 
   llvm::Function* compile(LLVMContext* context) override;
 };
