@@ -65,12 +65,12 @@ int main(int argc, char* argv[]) {
     lines.emplace_back(line); 
   }
 
-  isa::CPU cpu;
-  int code = parse(cpu, lines);
+  ParsingContext pcxt;
+  int code = parse(pcxt, lines);
   if (code) return 1;
 
   if (argv[1] == PRINT_ISA) {
-    for (auto [_, func] : cpu.functions) {
+    for (auto [_, func] : pcxt.functions) {
       llvm::outs() << func->str() << "\n";
       for (isa::Runnable* next = func->next; next; next = next->next) {
         llvm::outs() << next->str() << "\n";
@@ -79,11 +79,12 @@ int main(int argc, char* argv[]) {
     }
     return 0;  
   } else if (argv[1] == RUN_ISA) {
-    isa::Function* func = cpu.functions["#app(0)"];
+    isa::Function* func = pcxt.functions["#app(0)"];
     if (!func) {
       llvm::errs() << "#app(0) not found\n";
       return 1;
     }
+    isa::CPU cpu;
     simInit();
     isa::run(cpu, func, true);
     simExit();
@@ -96,7 +97,7 @@ int main(int argc, char* argv[]) {
 
   isa::LLVMContext cxt{&builder, module, {}, {}};
 
-  for (auto [fname, func] : cpu.functions) {
+  for (auto [fname, func] : pcxt.functions) {
     func->compile(&cxt);
   }
   

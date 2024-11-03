@@ -86,15 +86,6 @@ std::string isa::Function::str() {
 
 isa::Label::Label(std::string name) : name_(name) {}
 
-isa::CPU::CPU() {
-  for (size_t i = 0; i < REG_CNT; ++i) {
-    LI[i] = allocate(Reg<W8_t>(i));
-    XI[i] = allocate(Reg<W16_t>(i));
-    EXI[i] = allocate(Reg<W32_t>(i));
-    RXI[i] = allocate(Reg<W64_t>(i));
-  }
-}
-
 isa::Runnable* isa::Drw::run(CPU& cpu) {
   simPutPixel(std::get<0>(Base::ops)->eval(cpu), std::get<1>(Base::ops)->eval(cpu), std::get<2>(Base::ops)->eval(cpu));
   return Base::next;

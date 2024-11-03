@@ -2,10 +2,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <map>
-#include <memory>
 #include <string>
 #include <type_traits>
-#include <utility>
 #include <vector>
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
 #include "llvm/IR/BasicBlock.h"
@@ -161,25 +159,7 @@ class CPU {
 private:
   REG_t regs[REG_CNT];
 public:
-  std::array<Reg<W8_t>*, REG_CNT> LI;
-  std::array<Reg<W16_t>*, REG_CNT> XI;
-  std::array<Reg<W32_t>*, REG_CNT> EXI;
-  std::array<Reg<W64_t>*, REG_CNT> RXI;
-  std::vector<std::unique_ptr<ISAObject>> allocated;
   std::vector<CallFrame> callstack;
-  std::unordered_map<std::string, Function*> functions;
-  std::unordered_map<std::string, Function*> external_functions;
-  std::unordered_map<std::string, std::map<std::string, Label*>> labels;
-
-  CPU();
-
-  template <typename T, typename T2 = std::remove_reference_t<T>>
-  T2* allocate(T&& t) {
-    std::unique_ptr<T2> ptr = std::make_unique<T2>(std::forward<T&&>(t));
-    T2* res = ptr.get();
-    allocated.emplace_back(std::move(ptr));
-    return res;
-  }
 
   template <typename T>
   T get_reg(size_t num) {
