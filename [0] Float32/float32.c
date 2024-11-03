@@ -136,7 +136,6 @@ F32_FLOAT_T f32_add(F32_FLOAT_T a, F32_FLOAT_T b) {
         return build_float(a_s, a_exp, a_mantissa, 0, 0);
         
     }
-    //todo
 }
 
 F32_FLOAT_T f32_negate(F32_FLOAT_T a) {

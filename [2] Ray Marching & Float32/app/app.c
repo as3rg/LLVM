@@ -206,10 +206,10 @@ void app() {
 
   COLOR_T data[SIM_X_SIZE][SIM_Y_SIZE];
   for (int i = 0; i < SIM_X_SIZE; ++i) {
-      for (int j = 0; j < SIM_Y_SIZE; ++j) {
-        data[i][j] = 0;
-      }
+    for (int j = 0; j < SIM_Y_SIZE; ++j) {
+      data[i][j] = 0;
     }
+  }
 
 
   for (int i = 0; i < SIM_X_SIZE; ++i) {

@@ -18,9 +18,9 @@
 #define F32_E_POS F32_T_SIZE
 #define F32_S_POS (F32_T_SIZE + F32_E_SIZE)
 
-#define F32_S_MASK (1 << (F32_E_SIZE + F32_T_SIZE))
-#define F32_E_MASK (~(-1 << F32_E_SIZE) << F32_T_SIZE)
-#define F32_T_MASK (~(-1 << F32_T_SIZE))
+#define F32_S_MASK (1u << (F32_E_SIZE + F32_T_SIZE))
+#define F32_E_MASK (~(-1u << F32_E_SIZE) << F32_T_SIZE)
+#define F32_T_MASK (~(-1u << F32_T_SIZE))
 
 #define F32_QNAN (F32_S_MASK | F32_E_MASK | F32_T_MASK)
 #define F32_SNAN (F32_E_MASK | F32_T_MASK)
