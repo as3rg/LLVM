@@ -605,7 +605,7 @@ public:
 
 protected:
   llvm::Value* compile_build(llvm::IRBuilder<>* builder, std::array<llvm::Value*, 2> ops) override {
-    return builder->CreateAdd(ops[0], ops[1]);
+    return builder->CreateAnd(ops[0], ops[1]);
   }
 };
 
@@ -671,7 +671,7 @@ public:
 
 protected:
   llvm::Value* compile_build(llvm::IRBuilder<>* builder, std::array<llvm::Value*, 2> ops) override {
-    return builder->CreateLShr(ops[0], ops[1]);
+    return builder->CreateShl(ops[0], builder->CreateSExtOrTrunc(ops[1], ops[0]->getType()));
   }
 };
 
@@ -693,7 +693,7 @@ public:
 
 protected:
   llvm::Value* compile_build(llvm::IRBuilder<>* builder, std::array<llvm::Value*, 2> ops) override {
-    return builder->CreateLShr(ops[0], ops[1]);
+    return builder->CreateLShr(ops[0], builder->CreateSExtOrTrunc(ops[1], ops[0]->getType()));
   }
 };
 
@@ -715,7 +715,7 @@ public:
 
 protected:
   llvm::Value* compile_build(llvm::IRBuilder<>* builder, std::array<llvm::Value*, 2> ops) override {
-    return builder->CreateAShr(ops[0], ops[1]);
+    return builder->CreateAShr(ops[0], builder->CreateSExtOrTrunc(ops[1], ops[0]->getType()));
   }
 };
 
