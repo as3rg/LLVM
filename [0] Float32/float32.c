@@ -35,8 +35,8 @@ static F32_FLOAT_T set_t(F32_FLOAT_T a, uint t) {
 }
 
 // fixed point with F32_T_SIZE bits after a point
-static ull get_mantissa(F32_FLOAT_T a) {
-    ull res = get_t(a);
+static uint get_mantissa(F32_FLOAT_T a) {
+    uint res = get_t(a);
     if (!f32_is_subnormal(a) && !f32_is_zero(a)) {
         res |= 1 << F32_T_SIZE;
     }
@@ -113,9 +113,9 @@ F32_FLOAT_T f32_add(F32_FLOAT_T a, F32_FLOAT_T b) {
     // |a| >= |b|
 
     if (a_s == b_s) {
-        ull a_shift = a_exp - b_exp;
-        ull a_shift_trunc = min(a_shift, F32_T_SIZE + 1);
-        ull b_shift = min(a_shift - a_shift_trunc, F32_T_SIZE + 1);
+        uint a_shift = a_exp - b_exp;
+        uint a_shift_trunc = min(a_shift, F32_T_SIZE + 1);
+        uint b_shift = min(a_shift - a_shift_trunc, F32_T_SIZE + 1);
 
         a_mantissa <<= a_shift_trunc;
         a_exp -= a_shift_trunc;
@@ -134,7 +134,6 @@ F32_FLOAT_T f32_add(F32_FLOAT_T a, F32_FLOAT_T b) {
             --a_exp;
         }
         return build_float(a_s, a_exp, a_mantissa, 0, 0);
-        
     }
 }
 
@@ -206,7 +205,7 @@ F32_FLOAT_T f32_div(F32_FLOAT_T a, F32_FLOAT_T b) {
     }
 
     char carry = a_mantissa * 2 >= b_mantissa;
-    int ones = (a_mantissa * 2 > b_mantissa) ? 2 : (a_mantissa > 0);
+    int ones = carry + (a_mantissa > 0);
     return build_float(res_s, res_exp, res_mantissa, carry, ones);
 }
 
@@ -287,10 +286,6 @@ ll f32_to_ll(F32_FLOAT_T a) {
 }
 
 F32_FLOAT_T f32_from_ll(ll a) {
-    char s = a < 0;
-    if (a == LL_MIN) {
-        return build_float(1, -(LL_SIZE - 1), 1, 0, 0);
-    }
     if (a == 0) {
         return 0;
     }

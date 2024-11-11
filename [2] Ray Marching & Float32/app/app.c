@@ -217,10 +217,8 @@ void app() {
       data[i][j] = ray(SPHERE_X, SPHERE_Y, SPHERE_Z, SPHERE_R, SPHERE_REFL, SPHERE_COLOR, i, j);
     }
 
-    for (int i = 0; i < SIM_X_SIZE; ++i) {
-      for (int j = 0; j < SIM_Y_SIZE; ++j) {
-        simPutPixel(i, j, data[i][j]);
-      }
+    for (int j = 0; j < SIM_Y_SIZE; ++j) {
+      simPutPixel(i, j, data[i][j]);
     }
 
     simFlush();
