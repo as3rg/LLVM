@@ -12,20 +12,16 @@ build-isa-to-ir:
 	clang++ -g -std=c++23 ../isa-parser.cpp ../isa.cpp ../sim.c ../isa-to-ir.cpp -lSDL2 $$(llvm-config --cppflags --ldflags --libs)
 
 run-isa: FORCE
-	./build/a.out run-isa
+	./build/a.out run-isa < app.s
 
 run-ir: FORCE
-	./build/a.out run-ir
+	./build/a.out run-ir < app.s
 
 print-isa: FORCE
-	./build/a.out print-isa
+	./build/a.out print-isa < app.s
 
 print-ir: FORCE
-	./build/a.out print-ir
-
-run:
-	cd build && \
-	clang++ ../single.ll ../sim.c ../start.c -lSDL2
+	./build/a.out print-ir < app.s
 
 clean:
 	rm -rf build

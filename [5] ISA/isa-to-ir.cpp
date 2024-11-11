@@ -85,9 +85,7 @@ int main(int argc, char* argv[]) {
       return 1;
     }
     isa::CPU cpu;
-    simInit();
     isa::run(cpu, func, true);
-    simExit();
     return 0;
   }
 
@@ -120,6 +118,12 @@ int main(int argc, char* argv[]) {
       }
       if (fnName == "simFlush") {
         return reinterpret_cast<void *>(simFlush);
+      }
+      if (fnName == "simAlloc") {
+        return reinterpret_cast<void *>(simAlloc);
+      }
+      if (fnName == "simFree") {
+        return reinterpret_cast<void *>(simFree);
       }
       return nullptr;
     });

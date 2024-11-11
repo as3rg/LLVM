@@ -502,40 +502,26 @@ mv ex0, (w32) -1
 ret
 
 #app(0):
-mv ex0, (w32) 12
-call #simAlloc(1)
 ; SPHERE_X
-mv rx8, rx0
+alloc rx8, (w32) 12
 
-mv ex0, (w32) 12
-call #simAlloc(1)
 ; SPHERE_Y
-mv rx9, rx0
+alloc rx9, (w32) 12
 
-mv ex0, (w32) 12
-call #simAlloc(1)
 ; SPHERE_Z
-mv rx10, rx0
+alloc rx10, (w32) 12
 
-mv ex0, (w32) 12
-call #simAlloc(1)
 ; SPHERE_R
-mv rx11, rx0
+alloc rx11, (w32) 12
 
-mv ex0, (w32) 12
-call #simAlloc(1)
 ; SPHERE_REFL
-mv rx12, rx0
+alloc rx12, (w32) 12
 
-mv ex0, (w32) 12
-call #simAlloc(1)
 ; SPHERE_COLOR
-mv rx13, rx0
+alloc rx13, (w32) 12
 
-mv ex0, (w32) 1000000
-call #simAlloc(1)
 ; DATA
-mv rx14, rx0
+alloc rx14, (w32) 1000000
 
 mv rx0, rx8
 mv rx1, rx9
@@ -590,10 +576,8 @@ mul rx2, rx16, (w64) 500
 add rx2, rx2, rx17
 mul rx2, rx2, (w64) 4
 add rx2, rx14, rx2
-mv ex2, (w32) *rx2
-mv ex0, ex16
-mv ex1, ex17
-call #simPutPixel(3)
+
+drw ex16, ex17, (w32) *rx2
 
 add ex17, ex17, (w32) 1
 lt l2, ex17, (w32) 500
@@ -603,27 +587,20 @@ add ex16, ex16, (w32) 1
 lt l2, ex16, (w32) 500
 jpc l2, %lbl4
 
-call #simFlush(0)
+flsh
 
 add ex15, ex15, (w32) 1
 lt l2, ex15, (w32) 500
 jpc l2, %lbl2
 
 
-mv rx0, rx14
-call #simFree(1)
-mv rx0, rx13
-call #simFree(1)
-mv rx0, rx12
-call #simFree(1)
-mv rx0, rx11
-call #simFree(1)
-mv rx0, rx10
-call #simFree(1)
-mv rx0, rx9
-call #simFree(1)
-mv rx0, rx8
-call #simFree(1)
+free rx14
+free rx13
+free rx12
+free rx11
+free rx10
+free rx9
+free rx8
 ret
 
 ;;;;;;;;;;;;

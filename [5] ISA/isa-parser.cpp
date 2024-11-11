@@ -225,7 +225,8 @@ Res run(const auto& func, const std::array<ArgType, arg_cnt>& arg_types, Pack<TS
 }
 
 template <template <typename> typename Instruction>
-isa::Runnable* parse_binary_op(ParsingContext& pcxt, const std::vector<std::string>& args, std::string current_function, std::string current_label) {
+isa::Runnable* parse_binary_op(ParsingContext& pcxt, const std::vector<std::string>& args, std::string current_function,
+                               std::string current_label) {
   return run<1, isa::Runnable*>(([&]<typename T>(Pack<T>) -> isa::Runnable* {
                                   if constexpr (isa::is_word_v<T>) {
                                     if (args.size() != 3) {
@@ -245,7 +246,8 @@ isa::Runnable* parse_binary_op(ParsingContext& pcxt, const std::vector<std::stri
 }
 
 template <template <typename, typename> typename Instruction>
-isa::Runnable* parse_shift(ParsingContext& pcxt, const std::vector<std::string>& args, std::string current_function, std::string current_label) {
+isa::Runnable* parse_shift(ParsingContext& pcxt, const std::vector<std::string>& args, std::string current_function,
+                           std::string current_label) {
   return run<2, isa::Runnable*>(([&]<typename T, typename ST>(Pack<T, ST>) -> isa::Runnable* {
                                   if constexpr (isa::is_word_v<T> && isa::is_word_v<ST>) {
                                     if (args.size() != 3) {
@@ -253,7 +255,8 @@ isa::Runnable* parse_shift(ParsingContext& pcxt, const std::vector<std::string>&
                                     }
                                     auto* res = parse_op<isa::Dest<T>>(pcxt, args[0], current_function, current_label);
                                     auto* op1 = parse_op<isa::Value<T>>(pcxt, args[1], current_function, current_label);
-                                    auto* op2 = parse_op<isa::Value<ST>>(pcxt, args[2], current_function, current_label);
+                                    auto* op2 =
+                                        parse_op<isa::Value<ST>>(pcxt, args[2], current_function, current_label);
                                     if (!res || !op1 || !op2) {
                                       return nullptr;
                                     }
@@ -265,7 +268,8 @@ isa::Runnable* parse_shift(ParsingContext& pcxt, const std::vector<std::string>&
 }
 
 template <template <typename> typename Instruction>
-isa::Runnable* parse_unary_op(ParsingContext& pcxt, const std::vector<std::string>& args, std::string current_function, std::string current_label) {
+isa::Runnable* parse_unary_op(ParsingContext& pcxt, const std::vector<std::string>& args, std::string current_function,
+                              std::string current_label) {
   return run<1, isa::Runnable*>(([&]<typename T>(Pack<T>) -> isa::Runnable* {
                                   if constexpr (isa::is_word_v<T>) {
                                     if (args.size() != 2) {
@@ -284,7 +288,8 @@ isa::Runnable* parse_unary_op(ParsingContext& pcxt, const std::vector<std::strin
 }
 
 template <template <typename, typename> typename Instruction>
-isa::Runnable* parse_logical(ParsingContext& pcxt, const std::vector<std::string>& args, std::string current_function, std::string current_label) {
+isa::Runnable* parse_logical(ParsingContext& pcxt, const std::vector<std::string>& args, std::string current_function,
+                             std::string current_label) {
   return run<2, isa::Runnable*>(([&]<typename CT, typename T>(Pack<CT, T>) -> isa::Runnable* {
                                   if constexpr (isa::is_word_v<CT> && isa::is_word_v<T>) {
                                     if (args.size() != 3) {
@@ -356,7 +361,8 @@ int parse(ParsingContext& pcxt, const std::vector<std::string>& lines) {
 
       pcxt.labels[current_function] = {};
     } else if (std::regex_search(line, matches, label_regex)) {
-      ASSERT_FALSE(current_function.empty(), std::format("{}: function declaration expected before the instruction", line_num));
+      ASSERT_FALSE(current_function.empty(),
+                   std::format("{}: function declaration expected before the instruction", line_num));
       std::string name = matches[1];
       isa::Label* label = pcxt.allocate(isa::Label(name));
       name = label->str();
@@ -379,7 +385,6 @@ int parse(ParsingContext& pcxt, const std::vector<std::string>& lines) {
       current_function = name;
       current_label = "";
 
-      //TODO: fix
       isa::Runnable* nop = pcxt.allocate(isa::Nop());
       pcxt.functions[current_function]->next = nop;
       next = nop;
@@ -404,43 +409,43 @@ int parse(ParsingContext& pcxt, const std::vector<std::string>& lines) {
       } else if (name == "mul") {
         next = next->next = parse_binary_op<isa::Mul>(pcxt, args, current_function, current_label);
       } else if (name == "div") {
-        next = next->next =
-            run<1, isa::Runnable*>(([&]<typename T>(Pack<T>) -> isa::Runnable* {
-                                     if constexpr (isa::is_word_v<T>) {
-                                       if (args.size() != 4) {
-                                         return nullptr;
-                                       }
-                                       auto* div = parse_op<isa::Dest<T>>(pcxt, args[0], current_function, current_label);
-                                       auto* rem = parse_op<isa::Dest<T>>(pcxt, args[1], current_function, current_label);
-                                       auto* op1 = parse_op<isa::Value<T>>(pcxt, args[2], current_function, current_label);
-                                       auto* op2 = parse_op<isa::Value<T>>(pcxt, args[3], current_function, current_label);
-                                       if (!div || !rem || !op1 || !op2) {
-                                         return nullptr;
-                                       }
-                                       return pcxt.allocate(isa::Div<T>(div, rem, op1, op2));
-                                     }
-                                     return nullptr;
-                                   }),
-                                   {get_type(args[0])});
+        next = next->next = run<1, isa::Runnable*>(
+            ([&]<typename T>(Pack<T>) -> isa::Runnable* {
+              if constexpr (isa::is_word_v<T>) {
+                if (args.size() != 4) {
+                  return nullptr;
+                }
+                auto* div = parse_op<isa::Dest<T>>(pcxt, args[0], current_function, current_label);
+                auto* rem = parse_op<isa::Dest<T>>(pcxt, args[1], current_function, current_label);
+                auto* op1 = parse_op<isa::Value<T>>(pcxt, args[2], current_function, current_label);
+                auto* op2 = parse_op<isa::Value<T>>(pcxt, args[3], current_function, current_label);
+                if (!div || !rem || !op1 || !op2) {
+                  return nullptr;
+                }
+                return pcxt.allocate(isa::Div<T>(div, rem, op1, op2));
+              }
+              return nullptr;
+            }),
+            {get_type(args[0])});
       } else if (name == "udiv") {
-        next = next->next =
-            run<1, isa::Runnable*>(([&]<typename T>(Pack<T>) -> isa::Runnable* {
-                                     if (args.size() != 4) {
-                                       return nullptr;
-                                     }
-                                     if constexpr (isa::is_word_v<T>) {
-                                       auto* div = parse_op<isa::Dest<T>>(pcxt, args[0], current_function, current_label);
-                                       auto* rem = parse_op<isa::Dest<T>>(pcxt, args[1], current_function, current_label);
-                                       auto* op1 = parse_op<isa::Value<T>>(pcxt, args[2], current_function, current_label);
-                                       auto* op2 = parse_op<isa::Value<T>>(pcxt, args[3], current_function, current_label);
-                                       if (!div || !rem || !op1 || !op2) {
-                                         return nullptr;
-                                       }
-                                       return pcxt.allocate(isa::UDiv<T>(div, rem, op1, op2));
-                                     }
-                                     return nullptr;
-                                   }),
-                                   {get_type(args[0])});
+        next = next->next = run<1, isa::Runnable*>(
+            ([&]<typename T>(Pack<T>) -> isa::Runnable* {
+              if (args.size() != 4) {
+                return nullptr;
+              }
+              if constexpr (isa::is_word_v<T>) {
+                auto* div = parse_op<isa::Dest<T>>(pcxt, args[0], current_function, current_label);
+                auto* rem = parse_op<isa::Dest<T>>(pcxt, args[1], current_function, current_label);
+                auto* op1 = parse_op<isa::Value<T>>(pcxt, args[2], current_function, current_label);
+                auto* op2 = parse_op<isa::Value<T>>(pcxt, args[3], current_function, current_label);
+                if (!div || !rem || !op1 || !op2) {
+                  return nullptr;
+                }
+                return pcxt.allocate(isa::UDiv<T>(div, rem, op1, op2));
+              }
+              return nullptr;
+            }),
+            {get_type(args[0])});
       } else if (name == "and") {
         next = next->next = parse_binary_op<isa::And>(pcxt, args, current_function, current_label);
       } else if (name == "or") {
@@ -468,39 +473,40 @@ int parse(ParsingContext& pcxt, const std::vector<std::string>& lines) {
       } else if (name == "mv") {
         next = next->next = parse_unary_op<isa::Mv>(pcxt, args, current_function, current_label);
       } else if (name == "mvc") {
-        next = next->next = run<2, isa::Runnable*>(([&]<typename CT, typename T>(Pack<CT, T>) -> isa::Runnable* {
-                                  if constexpr (isa::is_word_v<CT> && isa::is_word_v<T>) {
-                                    if (args.size() != 3) {
-                                      return nullptr;
-                                    }
-                                    auto* cond = parse_op<isa::Value<CT>>(pcxt, args[0], current_function, current_label);
-                                    auto* res = parse_op<isa::DestValue<T>>(pcxt, args[1], current_function, current_label);
-                                    auto* op = parse_op<isa::Value<T>>(pcxt, args[2], current_function, current_label);
-                                    if (!cond || !res || !op) {
-                                      return nullptr;
-                                    }
-                                    return pcxt.allocate(isa::MvC<CT, T>(cond, res, op));
-                                  }
-                                  return nullptr;
-                                }),
-                                {get_type(args[0]), get_type(args[1])});
+        next = next->next = run<2, isa::Runnable*>(
+            ([&]<typename CT, typename T>(Pack<CT, T>) -> isa::Runnable* {
+              if constexpr (isa::is_word_v<CT> && isa::is_word_v<T>) {
+                if (args.size() != 3) {
+                  return nullptr;
+                }
+                auto* cond = parse_op<isa::Value<CT>>(pcxt, args[0], current_function, current_label);
+                auto* res = parse_op<isa::DestValue<T>>(pcxt, args[1], current_function, current_label);
+                auto* op = parse_op<isa::Value<T>>(pcxt, args[2], current_function, current_label);
+                if (!cond || !res || !op) {
+                  return nullptr;
+                }
+                return pcxt.allocate(isa::MvC<CT, T>(cond, res, op));
+              }
+              return nullptr;
+            }),
+            {get_type(args[0]), get_type(args[1])});
       } else if (name == "swp") {
-        next = next->next =
-            run<1, isa::Runnable*>(([&]<typename T>(Pack<T>) -> isa::Runnable* {
-                                     if constexpr (isa::is_word_v<T>) {
-                                       if (args.size() != 2) {
-                                         return nullptr;
-                                       }
-                                       auto* op1 = parse_op<isa::DestValue<T>>(pcxt, args[0], current_function, current_label);
-                                       auto* op2 = parse_op<isa::DestValue<T>>(pcxt, args[1], current_function, current_label);
-                                       if (!op1 || !op2) {
-                                         return nullptr;
-                                       }
-                                       return pcxt.allocate(isa::Swp<T>(op1, op2));
-                                     }
-                                     return nullptr;
-                                   }),
-                                   {get_type(args[0])});
+        next = next->next = run<1, isa::Runnable*>(
+            ([&]<typename T>(Pack<T>) -> isa::Runnable* {
+              if constexpr (isa::is_word_v<T>) {
+                if (args.size() != 2) {
+                  return nullptr;
+                }
+                auto* op1 = parse_op<isa::DestValue<T>>(pcxt, args[0], current_function, current_label);
+                auto* op2 = parse_op<isa::DestValue<T>>(pcxt, args[1], current_function, current_label);
+                if (!op1 || !op2) {
+                  return nullptr;
+                }
+                return pcxt.allocate(isa::Swp<T>(op1, op2));
+              }
+              return nullptr;
+            }),
+            {get_type(args[0])});
 
       } else if (name == "drw") {
         auto* x = parse_op<isa::Value<isa::COORD_t>>(pcxt, args[0], current_function, current_label);
@@ -509,6 +515,26 @@ int parse(ParsingContext& pcxt, const std::vector<std::string>& lines) {
         next = next->next = x && y && color ? pcxt.allocate(isa::Drw(x, y, color)) : nullptr;
       } else if (name == "flsh") {
         next = next->next = pcxt.allocate(isa::Flsh());
+      } else if (name == "free") {
+        auto* op = parse_op<isa::Value<isa::PTR_t>>(pcxt, args[0], current_function, current_label);
+        next = next->next = pcxt.allocate(isa::Free(op));
+      } else if (name == "alloc") {
+        next = next->next = run<1, isa::Runnable*>(
+            ([&]<typename T>(Pack<T>) -> isa::Runnable* {
+              if constexpr (isa::is_word_v<T>) {
+                if (args.size() != 2) {
+                  return nullptr;
+                }
+                auto* dest = parse_op<isa::Dest<isa::PTR_t>>(pcxt, args[0], current_function, current_label);
+                auto* n = parse_op<isa::Value<T>>(pcxt, args[1], current_function, current_label);
+                if (!n || !dest) {
+                  return nullptr;
+                }
+                return pcxt.allocate(isa::Alloc<T>(dest, n));
+              }
+              return nullptr;
+            }),
+            {get_type(args[1])});
       } else if (name == "call") {
         auto* func = parse_op<isa::Function>(pcxt, args[0], current_function, current_label);
         next = next->next = func ? pcxt.allocate(isa::Call(func)) : nullptr;
@@ -524,7 +550,8 @@ int parse(ParsingContext& pcxt, const std::vector<std::string>& lines) {
                                        if (args.size() != 2) {
                                          return nullptr;
                                        }
-                                       auto* cond = parse_op<isa::Value<T>>(pcxt, args[0], current_function, current_label);
+                                       auto* cond =
+                                           parse_op<isa::Value<T>>(pcxt, args[0], current_function, current_label);
                                        auto* lbl = parse_op<isa::Label>(pcxt, args[1], current_function, current_label);
                                        if (!cond || !lbl) {
                                          return nullptr;

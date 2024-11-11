@@ -1,7 +1,5 @@
 #include "isa.h"
 
-#include "sim.h"
-
 #include <format>
 
 std::string isa::Label::str() {
@@ -226,3 +224,23 @@ llvm::Function* isa::Function::compile(LLVMContext* context) {
 
   return func;
 }
+
+isa::Runnable* isa::Free::run(CPU& cpu) {
+  simFree(std::get<0>(Base::ops)->eval(cpu));
+  return Base::next;
+}
+
+void isa::Free::compile(LLVMFuncContext* context) {
+  auto* builder = context->global->builder;
+  LLVMReadContext readCxt{context};
+  static auto* func =
+      llvm::Function::Create(llvm::FunctionType::get(builder->getVoidTy(), {builder->getInt64Ty()}, false),
+                             llvm::Function::ExternalLinkage, "simFree", context->global->module);
+  builder->CreateCall(func, {std::get<0>(Base::ops)->compile(&readCxt)});
+}
+
+std::string isa::Free::name() {
+  return "free";
+}
+
+isa::Free::Free(Value<PTR_t>* src) : Base(src) {}

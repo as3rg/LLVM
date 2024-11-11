@@ -1,10 +1,3 @@
-#include <array>
-#include <cstddef>
-#include <cstdint>
-#include <map>
-#include <string>
-#include <type_traits>
-#include <vector>
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/DerivedTypes.h"
@@ -15,6 +8,17 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Value.h"
+#include "sim.h"
+
+#include <alloca.h>
+
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <map>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 namespace isa {
 using W8_t = uint8_t;
@@ -28,62 +32,62 @@ using COLOR_t = W32_t;
 constexpr size_t REG_CNT = 256;
 
 namespace helpers {
-  template <size_t... indexes>
-  struct List {};
+template <size_t... indexes>
+struct List {};
 
-  template <typename L1, typename L2>
-  struct Join;
+template <typename L1, typename L2>
+struct Join;
 
-  template <size_t... L1Ops, size_t... L2Ops>
-  struct Join<List<L1Ops...>, List<L2Ops...>> {
-    using list = List<L1Ops..., L2Ops...>;
-  };
+template <size_t... L1Ops, size_t... L2Ops>
+struct Join<List<L1Ops...>, List<L2Ops...>> {
+  using list = List<L1Ops..., L2Ops...>;
+};
 
-  template <size_t frm, size_t to>
-  struct Range {
-    using list = Join<List<frm>, typename Range<frm + 1, to>::list>::list;
-  };
+template <size_t frm, size_t to>
+struct Range {
+  using list = Join<List<frm>, typename Range<frm + 1, to>::list>::list;
+};
 
-  template <size_t frm, size_t to>
-    requires(frm >= to)
-  struct Range<frm, to> {
-    using list = List<>;
-  };
+template <size_t frm, size_t to>
+  requires(frm >= to)
+struct Range<frm, to> {
+  using list = List<>;
+};
 
-  template<typename Type>
-  llvm::Type* getType(llvm::IRBuilder<>* builder) {
-    if constexpr (std::is_same_v<Type, W8_t>) {
-      return builder->getInt8Ty();
-    } else if constexpr (std::is_same_v<Type, W16_t>) {
-      return builder->getInt16Ty();
-    } else if constexpr (std::is_same_v<Type, W32_t>) {
-      return builder->getInt32Ty();
-    } else if constexpr (std::is_same_v<Type, W64_t>) {
-      return builder->getInt64Ty();
-    } else {
-      return nullptr;
-    }
-  }
-
-  template<typename Type>
-  llvm::Value* getTypeConst(llvm::IRBuilder<>* builder, Type val) {
-    if constexpr (std::is_same_v<Type, W8_t>) {
-      return builder->getInt8(val);
-    } else if constexpr (std::is_same_v<Type, W16_t>) {
-      return builder->getInt16(val);
-    } else if constexpr (std::is_same_v<Type, W32_t>) {
-      return builder->getInt32(val);
-    } else if constexpr (std::is_same_v<Type, W64_t>) {
-      return builder->getInt64(val);
-    } else {
-      return nullptr;
-    }
+template <typename Type>
+llvm::Type* getType(llvm::IRBuilder<>* builder) {
+  if constexpr (std::is_same_v<Type, W8_t>) {
+    return builder->getInt8Ty();
+  } else if constexpr (std::is_same_v<Type, W16_t>) {
+    return builder->getInt16Ty();
+  } else if constexpr (std::is_same_v<Type, W32_t>) {
+    return builder->getInt32Ty();
+  } else if constexpr (std::is_same_v<Type, W64_t>) {
+    return builder->getInt64Ty();
+  } else {
+    return nullptr;
   }
 }
 
-template<typename Type>
+template <typename Type>
+llvm::Value* getTypeConst(llvm::IRBuilder<>* builder, Type val) {
+  if constexpr (std::is_same_v<Type, W8_t>) {
+    return builder->getInt8(val);
+  } else if constexpr (std::is_same_v<Type, W16_t>) {
+    return builder->getInt16(val);
+  } else if constexpr (std::is_same_v<Type, W32_t>) {
+    return builder->getInt32(val);
+  } else if constexpr (std::is_same_v<Type, W64_t>) {
+    return builder->getInt64(val);
+  } else {
+    return nullptr;
+  }
+}
+} // namespace helpers
+
+template <typename Type>
 constexpr bool is_word_v = (std::is_same_v<Type, W8_t> || std::is_same_v<Type, W16_t> || std::is_same_v<Type, W32_t> ||
-           std::is_same_v<Type, W64_t>);
+                            std::is_same_v<Type, W64_t>);
 
 class CPU;
 class LLVMContext;
@@ -92,6 +96,7 @@ class LLVMFuncContext;
 class ISAObject {
 protected:
   ISAObject() = default;
+
 public:
   virtual ~ISAObject() = default;
 };
@@ -101,7 +106,7 @@ public:
   virtual std::string str() = 0;
 };
 
-template<typename Ret, typename Context>
+template <typename Ret, typename Context>
 class IRCompilable : virtual public ISAObject {
 public:
   virtual Ret compile(Context* context) = 0;
@@ -121,8 +126,8 @@ class Label;
 
 class LLVMContext {
 public:
-  llvm::IRBuilder<> *builder;
-  llvm::Module *module;
+  llvm::IRBuilder<>* builder;
+  llvm::Module* module;
   std::map<std::string, llvm::Function*> functions;
   std::map<std::string, llvm::Function*> function_declarations;
   std::map<std::string, std::map<std::string, llvm::BasicBlock*>> blocks;
@@ -138,18 +143,18 @@ public:
 };
 
 class LLVMReadContext {
-  public:
+public:
   LLVMFuncContext* funcContext;
 };
 
 class LLVMWriteContext {
-  public:
+public:
   LLVMFuncContext* funcContext;
   llvm::Value* value;
 };
 
 class CallFrame {
-  public:
+public:
   Runnable* ret_point;
   size_t args_cnt;
   REG_t regs[REG_CNT];
@@ -158,6 +163,7 @@ class CallFrame {
 class CPU {
 private:
   REG_t regs[REG_CNT];
+
 public:
   std::vector<CallFrame> callstack;
 
@@ -233,7 +239,8 @@ public:
 
   llvm::Value* compile(LLVMReadContext* context) override {
     auto* builder = context->funcContext->global->builder;
-    llvm::Value* val = builder->CreateLoad(llvm::Type::getInt64Ty(builder->getContext()), context->funcContext->registers[num]);
+    llvm::Value* val =
+        builder->CreateLoad(llvm::Type::getInt64Ty(builder->getContext()), context->funcContext->registers[num]);
     return builder->CreateTrunc(val, helpers::getType<Type>(builder));
   }
 
@@ -372,17 +379,17 @@ public:
 
   void compile(LLVMWriteContext* context) override {
     auto* builder = context->funcContext->global->builder;
-    LLVMReadContext readCxt {context->funcContext};
+    LLVMReadContext readCxt{context->funcContext};
 
     llvm::Value* val = addr->compile(&readCxt);
     val = builder->CreateIntToPtr(val, helpers::getType<Type>(builder)->getPointerTo());
-    
+
     builder->CreateStore(context->value, val);
   }
 };
 
 template <typename... Ops>
-requires (true && ... && std::is_base_of_v<Printable, Ops>)
+  requires(true && ... && std::is_base_of_v<Printable, Ops>)
 class Instruction : public Runnable {
 protected:
   std::tuple<Ops*...> ops;
@@ -397,7 +404,7 @@ public:
   }
 
 private:
-  template<typename... TS>
+  template <typename... TS>
   static std::string str_ops(TS*... ts) {
     if constexpr (sizeof...(TS)) {
       return str_ops_impl(ts...);
@@ -406,7 +413,7 @@ private:
     }
   }
 
-  template<typename T, typename... TS>
+  template <typename T, typename... TS>
   static std::string str_ops_impl(T* t, TS*... ts) {
     if constexpr (sizeof...(TS)) {
       return " " + t->str() + "," + str_ops_impl<TS...>(ts...);
@@ -435,13 +442,13 @@ public:
   }
 
 protected:
-  template<size_t... Indexes>
+  template <size_t... Indexes>
   Runnable* run_impl(CPU& cpu, helpers::List<Indexes...>) {
     std::get<0>(Base::ops)->update(cpu, calc(std::get<Indexes>(Base::ops)->eval(cpu)...));
     return Base::next;
   }
 
-  template<size_t... Indexes>
+  template <size_t... Indexes>
   void compile_impl(LLVMFuncContext* context, helpers::List<Indexes...>) {
     LLVMReadContext readCxt{context};
     llvm::Value* res = compile_build(context->global->builder, {std::get<Indexes>(Base::ops)->compile(&readCxt)...});
@@ -902,16 +909,15 @@ protected:
     return static_cast<UnsignedType>(op1) < static_cast<UnsignedType>(op2);
   }
 
+  llvm::Value* compile_build(llvm::IRBuilder<>* builder, std::array<llvm::Value*, 2> ops) override {
+    return builder->CreateICmpULT(ops[0], ops[1]);
+  }
+
 public:
   ULt(Dest<ResType>* dest, Value<Type>* op1, Value<Type>* op2) : Base(dest, op1, op2) {}
 
   std::string name() override {
     return "ult";
-  }
-
-protected:
-  llvm::Value* compile_build(llvm::IRBuilder<>* builder, std::array<llvm::Value*, 2> ops) override {
-    return builder->CreateICmpULT(ops[0], ops[1]);
   }
 };
 
@@ -943,6 +949,47 @@ class Drw : public Instruction<Value<COORD_t>, Value<COORD_t>, Value<COLOR_t>> {
 
 public:
   Drw(Value<COORD_t>* x, Value<COORD_t>* y, Value<COLOR_t>* color);
+
+  std::string name() override;
+
+  Runnable* run(CPU& cpu) override;
+
+  void compile(LLVMFuncContext* context) override;
+};
+
+template <typename Type>
+class Alloc : public Instruction<Dest<PTR_t>, Value<Type>> {
+  using Base = Instruction<Dest<PTR_t>, Value<Type>>;
+
+public:
+  Alloc(Dest<PTR_t>* dest, Value<Type>* n) : Base(dest, n) {}
+
+  std::string name() override {
+    return "alloc";
+  }
+
+  Runnable* run(CPU& cpu) override {
+    std::get<0>(Base::ops)->update(cpu, simAlloc(std::get<1>(Base::ops)->eval(cpu)));
+    return Base::next;
+  }
+
+  void compile(LLVMFuncContext* context) override {
+    auto* builder = context->global->builder;
+    LLVMReadContext readCxt{context};
+    static auto* func =
+        llvm::Function::Create(llvm::FunctionType::get(builder->getInt64Ty(), {builder->getInt64Ty()}, false),
+                               llvm::Function::ExternalLinkage, "simAlloc", context->global->module);
+    auto* res = builder->CreateCall(func, {std::get<1>(Base::ops)->compile(&readCxt)});
+    LLVMWriteContext writeCxt{context, res};
+    std::get<0>(Base::ops)->compile(&writeCxt);
+  }
+};
+
+class Free : public Instruction<Value<PTR_t>> {
+  using Base = Instruction<Value<PTR_t>>;
+
+public:
+  Free(Value<PTR_t>* src);
 
   std::string name() override;
 
@@ -1025,7 +1072,7 @@ public:
     auto* builder = context->global->builder;
     auto* func = context->func->compile_as_value(context);
     llvm::BasicBlock* next_block = llvm::BasicBlock::Create(builder->getContext(), "", func);
-    
+
     LLVMReadContext readCxt{context};
     auto* cond = std::get<0>(Base::ops)->compile(&readCxt);
     auto* lbl = std::get<1>(Base::ops)->compile_as_value(context);
