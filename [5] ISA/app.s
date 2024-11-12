@@ -3,9 +3,9 @@
 ;;;;;;;
 
 #sqr(1):
-mv ex1, ex0
-call #f32_mul(2)
-ret
+    mv ex1, ex0
+    call #f32_mul(2)
+    ret
 
 #dot_prod(6):
     swp ex3, ex1
@@ -221,11 +221,8 @@ ret
 
     call #ray_impl(14)
     
-    neq l2, ex0, (w32) -1
-    jpc l2, %lbl
-    mv ex0, (w32) 12303291
-    ret
-%lbl:
+    eq l2, ex0, (w32) -1
+    mvc l2, ex0, (w32) 12303291
     ret
 
 #init(6):
@@ -268,340 +265,340 @@ ret
 
 
 #ray_impl(14):
-; *SPHERE_X
-mv rx14, rx0
-; *SPHERE_Y
-mv rx15, rx1
-; *SPHERE_Z
-mv rx16, rx2
-; *SPHERE_R
-mv rx17, rx3
-; *SPHERE_REFL
-mv rx18, rx4
-; *SPHERE_COLOR
-mv rx19, rx5
+    ; *SPHERE_X
+    mv rx14, rx0
+    ; *SPHERE_Y
+    mv rx15, rx1
+    ; *SPHERE_Z
+    mv rx16, rx2
+    ; *SPHERE_R
+    mv rx17, rx3
+    ; *SPHERE_REFL
+    mv rx18, rx4
+    ; *SPHERE_COLOR
+    mv rx19, rx5
 
 %lbl:
 
-; step
-mv ex20, (w32) 1203982336
-; closest
-mv ex21, (w32) 0
-; s
-mv ex22, (w32) 0
-; s * 4
-mv ex23, (w32) 0
+    ; step
+    mv ex20, (w32) 1203982336
+    ; closest
+    mv ex21, (w32) 0
+    ; s
+    mv ex22, (w32) 0
+    ; s * 4
+    mv ex23, (w32) 0
 
-;; find SDF
+    ;; find SDF
 %lbl2:
-; sp_vec_x
-add rx0, rx14, rx23
-mv ex0, (w32) *rx0
-mv ex1, ex6
-call #f32_sub(2)
-mv ex3, ex0
-; sp_vec_y
-add rx0, rx15, rx23
-mv ex0, (w32) *rx0
-mv ex1, ex7
-call #f32_sub(2)
-mv ex4, ex0
-; sp_vec_z
-add rx0, rx16, rx23
-mv ex0, (w32) *rx0
-mv ex1, ex8
-call #f32_sub(2)
-mv ex5, ex0
+    ; sp_vec_x
+    add rx0, rx14, rx23
+    mv ex0, (w32) *rx0
+    mv ex1, ex6
+    call #f32_sub(2)
+    mv ex3, ex0
+    ; sp_vec_y
+    add rx0, rx15, rx23
+    mv ex0, (w32) *rx0
+    mv ex1, ex7
+    call #f32_sub(2)
+    mv ex4, ex0
+    ; sp_vec_z
+    add rx0, rx16, rx23
+    mv ex0, (w32) *rx0
+    mv ex1, ex8
+    call #f32_sub(2)
+    mv ex5, ex0
 
-mv ex0, ex3
-mv ex1, ex4
-mv ex2, ex5
-call #dist2(3)
-mv ex1, ex0
-call #qrsqrt(1)
-call #f32_mul(2)
-add rx1, rx17, rx23
-mv ex1, (w32) *rx1
-call #f32_sub(2)
-; step_new
-mv ex24, ex0
+    mv ex0, ex3
+    mv ex1, ex4
+    mv ex2, ex5
+    call #dist2(3)
+    mv ex1, ex0
+    call #qrsqrt(1)
+    call #f32_mul(2)
+    add rx1, rx17, rx23
+    mv ex1, (w32) *rx1
+    call #f32_sub(2)
+    ; step_new
+    mv ex24, ex0
 
-mv ex0, ex9
-mv ex1, ex10
-mv ex2, ex11
-call #dot_prod(6)
-mv ex1, ex0
-mv ex0, (w32) 0
-call #f32_less(2)
-xor l0, l0, (w8) 1
-jpc l0, %lbl3
-mv ex0, ex24
-mv ex1, ex20
-call #f32_less(2)
-xor l0, l0, (w8) 1
-jpc l0, %lbl3
-mv ex20, ex24
-mv ex21, ex22
+    mv ex0, ex9
+    mv ex1, ex10
+    mv ex2, ex11
+    call #dot_prod(6)
+    mv ex1, ex0
+    mv ex0, (w32) 0
+    call #f32_less(2)
+    xor l0, l0, (w8) 1
+    jpc l0, %lbl3
+    mv ex0, ex24
+    mv ex1, ex20
+    call #f32_less(2)
+    xor l0, l0, (w8) 1
+    jpc l0, %lbl3
+    mv ex20, ex24
+    mv ex21, ex22
 %lbl3:
 
-add ex22, ex22, (w32) 1
-add ex23, ex23, (w32) 4
-lt l0, ex22, (w32) 3
-jpc l0, %lbl2
+    add ex22, ex22, (w32) 1
+    add ex23, ex23, (w32) 4
+    lt l0, ex22, (w32) 3
+    jpc l0, %lbl2
 
-;; move
+    ;; move
 
-mv ex0, ex9
-mv ex1, ex20
-call #f32_mul(2)
-mv ex1, ex6
-call #f32_add(2)
-mv ex6, ex0
+    mv ex0, ex9
+    mv ex1, ex20
+    call #f32_mul(2)
+    mv ex1, ex6
+    call #f32_add(2)
+    mv ex6, ex0
 
-mv ex0, ex10
-mv ex1, ex20
-call #f32_mul(2)
-mv ex1, ex7
-call #f32_add(2)
-mv ex7, ex0
+    mv ex0, ex10
+    mv ex1, ex20
+    call #f32_mul(2)
+    mv ex1, ex7
+    call #f32_add(2)
+    mv ex7, ex0
 
-mv ex0, ex11
-mv ex1, ex20
-call #f32_mul(2)
-mv ex1, ex8
-call #f32_add(2)
-mv ex8, ex0
+    mv ex0, ex11
+    mv ex1, ex20
+    call #f32_mul(2)
+    mv ex1, ex8
+    call #f32_add(2)
+    mv ex8, ex0
 
-mul ex21, ex21, (w32) 4
+    mul ex21, ex21, (w32) 4
 
-;; reflect
+    ;; reflect
 
-mv ex0, ex20
-mv ex1, (w32) 1008981770
-call #f32_less(2)
-xor l0, l0, (w8) 1
-jpc l0, %lbl4
+    mv ex0, ex20
+    mv ex1, (w32) 1008981770
+    call #f32_less(2)
+    xor l0, l0, (w8) 1
+    jpc l0, %lbl4
 
-add rx0, rx14, rx21
-mv ex0, (w32) *rx0
-mv ex1, ex6
-call #f32_sub(2)
-mv ex3, ex0
-; sp_vec_y
-add rx0, rx15, rx21
-mv ex0, (w32) *rx0
-mv ex1, ex7
-call #f32_sub(2)
-mv ex4, ex0
-; sp_vec_z
-add rx0, rx16, rx21
-mv ex0, (w32) *rx0
-mv ex1, ex8
-call #f32_sub(2)
-mv ex5, ex0
+    add rx0, rx14, rx21
+    mv ex0, (w32) *rx0
+    mv ex1, ex6
+    call #f32_sub(2)
+    mv ex3, ex0
+    ; sp_vec_y
+    add rx0, rx15, rx21
+    mv ex0, (w32) *rx0
+    mv ex1, ex7
+    call #f32_sub(2)
+    mv ex4, ex0
+    ; sp_vec_z
+    add rx0, rx16, rx21
+    mv ex0, (w32) *rx0
+    mv ex1, ex8
+    call #f32_sub(2)
+    mv ex5, ex0
 
-mv ex0, ex3
-mv ex1, ex4
-mv ex2, ex5
-call #dist2(3)
-call #qrsqrt(1)
-mv ex2, ex0
+    mv ex0, ex3
+    mv ex1, ex4
+    mv ex2, ex5
+    call #dist2(3)
+    call #qrsqrt(1)
+    mv ex2, ex0
 
-mv ex0, ex3
-mv ex1, ex2
-call #f32_mul(2)
-mv ex3, ex0
-; sp_vec_x
-mv ex25, ex0
+    mv ex0, ex3
+    mv ex1, ex2
+    call #f32_mul(2)
+    mv ex3, ex0
+    ; sp_vec_x
+    mv ex25, ex0
 
-mv ex0, ex4
-mv ex1, ex2
-call #f32_mul(2)
-mv ex4, ex0
-; sp_vec_y
-mv ex26, ex0
+    mv ex0, ex4
+    mv ex1, ex2
+    call #f32_mul(2)
+    mv ex4, ex0
+    ; sp_vec_y
+    mv ex26, ex0
 
-mv ex0, ex5
-mv ex1, ex2
-call #f32_mul(2)
-mv ex5, ex0
-; sp_vec_z
-mv ex27, ex0
+    mv ex0, ex5
+    mv ex1, ex2
+    call #f32_mul(2)
+    mv ex5, ex0
+    ; sp_vec_z
+    mv ex27, ex0
 
-mv ex0, ex9
-mv ex1, ex10
-mv ex2, ex11
-mv ex3, ex25
-mv ex4, ex26
-mv ex5, ex27
-call #dot_prod(6)
-; cos_
-mv ex28, ex0
+    mv ex0, ex9
+    mv ex1, ex10
+    mv ex2, ex11
+    mv ex3, ex25
+    mv ex4, ex26
+    mv ex5, ex27
+    call #dot_prod(6)
+    ; cos_
+    mv ex28, ex0
 
-mv ex1, (w32) 1073741824
-call #f32_mul(2)
-; cos_2
-mv ex2, ex0
+    mv ex1, (w32) 1073741824
+    call #f32_mul(2)
+    ; cos_2
+    mv ex2, ex0
 
-mv ex0, ex2
-mv ex1, ex25
-call #f32_mul(2)
-mv ex1, ex0
-mv ex0, ex9
-call #f32_sub(2)
-mv ex9, ex0
+    mv ex0, ex2
+    mv ex1, ex25
+    call #f32_mul(2)
+    mv ex1, ex0
+    mv ex0, ex9
+    call #f32_sub(2)
+    mv ex9, ex0
 
-mv ex0, ex2
-mv ex1, ex26
-call #f32_mul(2)
-mv ex1, ex0
-mv ex0, ex10
-call #f32_sub(2)
-mv ex10, ex0 
+    mv ex0, ex2
+    mv ex1, ex26
+    call #f32_mul(2)
+    mv ex1, ex0
+    mv ex0, ex10
+    call #f32_sub(2)
+    mv ex10, ex0 
 
-mv ex0, ex2
-mv ex1, ex27
-call #f32_mul(2)
-mv ex1, ex0
-mv ex0, ex11
-call #f32_sub(2)
-mv ex11, ex0
+    mv ex0, ex2
+    mv ex1, ex27
+    call #f32_mul(2)
+    mv ex1, ex0
+    mv ex0, ex11
+    call #f32_sub(2)
+    mv ex11, ex0
 
-mv ex1, (w32) -1
-eq l0, ex13, (w32) 0
-jpc l0, %lbl5
+    mv ex1, (w32) -1
+    eq l0, ex13, (w32) 0
+    jpc l0, %lbl5
 
-mv rx0, rx14
-mv rx1, rx15
-mv rx2, rx16
-mv rx3, rx17
-mv rx4, rx18
-mv rx5, rx19
-sub ex13, ex13, (w32) 1
-call #ray_impl(14)
-mv ex1, ex0
+    mv rx0, rx14
+    mv rx1, rx15
+    mv rx2, rx16
+    mv rx3, rx17
+    mv rx4, rx18
+    mv rx5, rx19
+    sub ex13, ex13, (w32) 1
+    call #ray_impl(14)
+    mv ex1, ex0
 
 %lbl5:
-add rx0, rx19, rx21
-mv ex0, (w32) *rx0
-add rx2, rx18, rx21
-mv ex2, (w32) *rx2
-call #reflection(3)
+    add rx0, rx19, rx21
+    mv ex0, (w32) *rx0
+    add rx2, rx18, rx21
+    mv ex2, (w32) *rx2
+    call #reflection(3)
 
-mv ex1, ex28
-call #shadow(2) 
+    mv ex1, ex28
+    call #shadow(2) 
 
-ret
+    ret
 %lbl4:
 
-sub ex12, ex12, (w32) 1
-lt l0, (w32) 0, ex12
-jpc l0, %lbl
+    sub ex12, ex12, (w32) 1
+    lt l0, (w32) 0, ex12
+    jpc l0, %lbl
 
-mv ex0, (w32) -1
-ret
+    mv ex0, (w32) -1
+    ret
 
 #app(0):
-; SPHERE_X
-alloc rx8, (w32) 12
+    ; SPHERE_X
+    alloc rx8, (w32) 12
 
-; SPHERE_Y
-alloc rx9, (w32) 12
+    ; SPHERE_Y
+    alloc rx9, (w32) 12
 
-; SPHERE_Z
-alloc rx10, (w32) 12
+    ; SPHERE_Z
+    alloc rx10, (w32) 12
 
-; SPHERE_R
-alloc rx11, (w32) 12
+    ; SPHERE_R
+    alloc rx11, (w32) 12
 
-; SPHERE_REFL
-alloc rx12, (w32) 12
+    ; SPHERE_REFL
+    alloc rx12, (w32) 12
 
-; SPHERE_COLOR
-alloc rx13, (w32) 12
+    ; SPHERE_COLOR
+    alloc rx13, (w32) 12
 
-; DATA
-alloc rx14, (w32) 1000000
+    ; DATA
+    alloc rx14, (w32) 1000000
 
-mv rx0, rx8
-mv rx1, rx9
-mv rx2, rx10
-mv rx3, rx11
-mv rx4, rx12
-mv rx5, rx13
-call #init(6)
+    mv rx0, rx8
+    mv rx1, rx9
+    mv rx2, rx10
+    mv rx3, rx11
+    mv rx4, rx12
+    mv rx5, rx13
+    call #init(6)
 
-mv ex15, (w32) 0
+    mv ex15, (w32) 0
 %lbl:
-mul rx1, rx15, (w64) 4
-add rx1, rx14, rx1
-mv (w32) *rx1, (w32) 0
-add ex15, ex15, (w32) 1
-lt l2, ex15, (w32) 250000
-jpc l2, %lbl
+    mul rx1, rx15, (w64) 4
+    add rx1, rx14, rx1
+    mv (w32) *rx1, (w32) 0
+    add ex15, ex15, (w32) 1
+    lt l2, ex15, (w32) 250000
+    jpc l2, %lbl
 
-mv ex15, (w32) 0
+    mv ex15, (w32) 0
 %lbl2:
 
-mv ex16, (w32) 0
+    mv ex16, (w32) 0
 %lbl3:
 
-mv rx0, rx8
-mv rx1, rx9
-mv rx2, rx10
-mv rx3, rx11
-mv rx4, rx12
-mv rx5, rx13
-mv rx6, rx15
-mv rx7, rx16
-call #ray(8)
+    mv rx0, rx8
+    mv rx1, rx9
+    mv rx2, rx10
+    mv rx3, rx11
+    mv rx4, rx12
+    mv rx5, rx13
+    mv rx6, rx15
+    mv rx7, rx16
+    call #ray(8)
 
-mul rx1, rx15, (w64) 500
-add rx1, rx1, rx16
-mul rx1, rx1, (w64) 4
-add rx1, rx14, rx1
-mv (w32) *rx1, ex0
+    mul rx1, rx15, (w64) 500
+    add rx1, rx1, rx16
+    mul rx1, rx1, (w64) 4
+    add rx1, rx14, rx1
+    mv (w32) *rx1, ex0
 
-add ex16, ex16, (w32) 1
-lt l2, ex16, (w32) 500
-jpc l2, %lbl3
+    add ex16, ex16, (w32) 1
+    lt l2, ex16, (w32) 500
+    jpc l2, %lbl3
 
-mv ex16, (w32) 0
+    mv ex16, (w32) 0
 %lbl4:
 
-mv ex17, (w32) 0
+    mv ex17, (w32) 0
 %lbl5:
 
-mul rx2, rx16, (w64) 500
-add rx2, rx2, rx17
-mul rx2, rx2, (w64) 4
-add rx2, rx14, rx2
+    mul rx2, rx16, (w64) 500
+    add rx2, rx2, rx17
+    mul rx2, rx2, (w64) 4
+    add rx2, rx14, rx2
 
-drw ex16, ex17, (w32) *rx2
+    drw ex16, ex17, (w32) *rx2
 
-add ex17, ex17, (w32) 1
-lt l2, ex17, (w32) 500
-jpc l2, %lbl5
+    add ex17, ex17, (w32) 1
+    lt l2, ex17, (w32) 500
+    jpc l2, %lbl5
 
-add ex16, ex16, (w32) 1
-lt l2, ex16, (w32) 500
-jpc l2, %lbl4
+    add ex16, ex16, (w32) 1
+    lt l2, ex16, (w32) 500
+    jpc l2, %lbl4
 
-flsh
+    flsh
 
-add ex15, ex15, (w32) 1
-lt l2, ex15, (w32) 500
-jpc l2, %lbl2
+    add ex15, ex15, (w32) 1
+    lt l2, ex15, (w32) 500
+    jpc l2, %lbl2
 
 
-free rx14
-free rx13
-free rx12
-free rx11
-free rx10
-free rx9
-free rx8
-ret
+    free rx14
+    free rx13
+    free rx12
+    free rx11
+    free rx10
+    free rx9
+    free rx8
+    ret
 
 ;;;;;;;;;;;;
 ; Float 32 ;
@@ -720,10 +717,8 @@ ret
     ret
 
 #min(2):
-    ule l3, ex0, ex1
-    jpc l3, %lbl
-    mv ex0, ex1
-%lbl
+    ult l3, ex1, ex0
+    mvc l3, ex0, ex1
     ret
 
 #f32_negate(1):

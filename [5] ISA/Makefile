@@ -2,14 +2,10 @@ get-app:
 	mkdir -p build/code
 	cp -r ../'[2] Ray Marching & Float32'/* build/code/
 
-get-ir: get-app
-	cd build && \
-	clang code/app/app.c code/float32/*.c -Os -S -emit-llvm
-
 build-isa-to-ir:
 	mkdir -p build
 	cd build && \
-	clang++ -g -std=c++23 ../isa-parser.cpp ../isa.cpp ../sim.c ../isa-to-ir.cpp -lSDL2 $$(llvm-config --cppflags --ldflags --libs)
+	clang++ -std=c++23 ../isa-parser.cpp ../isa.cpp ../sim.c ../isa-to-ir.cpp -lSDL2 $$(llvm-config --cppflags --ldflags --libs)
 
 run-isa: FORCE
 	./build/a.out run-isa < app.s
@@ -22,6 +18,11 @@ print-isa: FORCE
 
 print-ir: FORCE
 	./build/a.out print-ir < app.s
+
+build-ir: FORCE
+	cd build && \
+	./a.out print-ir < ../app.s > app.ll && \
+	clang -O3 -o app.out -lSDL2 $$(llvm-config --cppflags --ldflags --libs) app.ll ../start.c ../sim.c
 
 clean:
 	rm -rf build

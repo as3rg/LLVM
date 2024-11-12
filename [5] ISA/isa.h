@@ -772,6 +772,7 @@ public:
     llvm::Value* cond = std::get<0>(Base::ops)->compile(&readCxt);
     llvm::Value* old_v = static_cast<Value<Type>*>(std::get<1>(Base::ops))->compile(&readCxt);
     llvm::Value* new_v = std::get<2>(Base::ops)->compile(&readCxt);
+    cond = builder->CreateICmpNE(cond, helpers::getTypeConst<CondType>(builder, 0));
     llvm::Value* res = builder->CreateSelect(cond, new_v, old_v);
     LLVMWriteContext writeCxt{context, res};
     static_cast<Dest<Type>*>(std::get<1>(Base::ops))->compile(&writeCxt);
