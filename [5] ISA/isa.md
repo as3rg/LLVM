@@ -5,10 +5,10 @@ Types used in ISA:
 - w16 &mdash; 16-bit value
 - w32 &mdash; 32-bit value
 - w64 &mdash; 64-bit value
-- %```lbl``` &mdash; label with name ```lbl``` (visible only inside its function)
-- #```func```(```n```) &mdash; function with name ```func```, which takes ```n``` arguments
+- Label
+- Function
 
-Types w8, w16, w32, w64 can have the following subtype:
+Types w8, w16, w32, w64 have the following subtype:
 - Value &mdash; represents the data, which can be read
 - Dest &mdash; represents the data, which can be written
 - DestValue &mdash; represents the data, which can be read and written
@@ -25,7 +25,7 @@ Register l```<i>``` represents the lower part of register x```<i>```.\
 Register x```<i>``` represents the lower part of register ex```<i>```.\
 Register ex```<i>``` represents the lower part of register rx```<i>```.
 
-When the lower part of the register is written, the higher part sets to zero.
+When the lower part of the register is written, the higher part is set to zero.
 
 Registers are the DestValue subtype.
 
@@ -61,7 +61,9 @@ Labels with the same name in the different functions are the diffenent labels.
 
 Functions are the named blocks of code, which can be executed. 
 
-All the functions should be written in the following form: ```#<name>(<args_count>)``` (ex. ```#foo_func(5)```).
+All the functions should be referred with the following form: ```#<name>(<args_count>)``` (ex. ```#foo_func(5)```).
+
+Name of the function should consist of latin letters, digits and ```_```.
 
 Functions with the same name and the same args count are forbidden.
 
@@ -119,62 +121,62 @@ Divide ```left``` by ```right``` as unsigned values and write the quotient to ``
 ### and
 ```and {res:t} <left:t> <right:t>```
 
-Compute logical AND of ```left``` and ```right``` and write the result to ```res```
+Compute bitwise AND of ```left``` and ```right``` and write the result to ```res```
 
 ### or
 ```or {res:t} <left:t> <right:t>```
 
-Compute logical OR of ```left``` and ```right``` and write the result to ```res```
+Compute bitwise OR of ```left``` and ```right``` and write the result to ```res```
 
 ### xor
 ```and {res:t} <left:t> <right:t>```
 
-Compute logical XOR of ```left``` and ```right``` and write the result to ```res```
+Compute bitwise XOR of ```left``` and ```right``` and write the result to ```res```
 
 ### lsh
-```and {res:t} <left:t> <right:t2>```
+```and {res:t} <op:t> <sh:t2>```
 
-Shift ```left``` left by ```right``` and write the result to ```res```
+Shift ```op``` left by ```sh``` and write the result to ```res```
 
 ### rshl
-```rshl {res:t} <left:t> <right:t2>```
+```rshl {res:t} <op:t> <sh:t2>```
 
-Shift ```left``` right by ```right``` logically and write the result to ```res```
+Shift ```op``` right by ```sh``` logically and write the result to ```res```
 
 ### rsha
-```rsha {res:t} <left:t> <right:t2>```
+```rsha {res:t} <op:t> <sh:t2>```
 
-Shift ```left``` right by ```right``` arithmetically and write the result to ```res```
+Shift ```op``` right by ```sh``` arithmetically and write the result to ```res```
 
 ### eq
 ```eq {res:t} <left:t2> <right:t2>```
 
-Compare ```left``` with ```right``` and write ```1``` to ```res``` if ```left``` is equal to ```right```, otherwise ```0```
+Compare ```left``` with ```right``` and write ```1``` to ```res``` if ```left``` is equal to ```right```, otherwise write  ```0```
 
 ### neq
 ```neq {res:t} <left:t2> <right:t2>```
 
-Compare ```left``` with ```right``` and write ```1``` to ```res``` if ```left``` is not equal to ```right```, otherwise ```0```
+Compare ```left``` with ```right``` and write ```1``` to ```res``` if ```left``` is not equal to ```right```, otherwise write  ```0```
 
 ### lt
 ```lt {res:t} <left:t2> <right:t2>```
 
-Compare ```left``` with ```right``` as a signed values and write ```1``` to ```res``` if ```left``` is less than ```right```, otherwise ```0```
+Compare ```left``` with ```right``` as a signed values and write ```1``` to ```res``` if ```left``` is less than ```right```, otherwise write  ```0```
 
 ### le
 ```le {res:t} <left:t2> <right:t2>```
 
-Compare ```left``` with ```right``` as a signed values and write ```1``` to ```res``` if ```left``` is less than or equal to ```right```, otherwise ```0```
+Compare ```left``` with ```right``` as a signed values and write ```1``` to ```res``` if ```left``` is less than or equal to ```right```, otherwise write  ```0```
 
 ### ult
 ```ult {res:t} <left:t2> <right:t2>```
 
-Compare ```left``` with ```right``` as a unsigned values and write ```1``` to ```res``` if ```left``` is less than ```right```, otherwise ```0```
+Compare ```left``` with ```right``` as a unsigned values and write ```1``` to ```res``` if ```left``` is less than ```right```, otherwise write  ```0```
 
 ### ule
 ```ule {res:t} <left:t2> <right:t2>```
 
-Compare ```left``` with ```right``` as a unsigned values and write ```1``` to ```res``` if ```left``` is less than or equal to ```right```, otherwise ```0```
+Compare ```left``` with ```right``` as a unsigned values and write ```1``` to ```res``` if ```left``` is less than or equal to ```right```, otherwise write  ```0```
 
 ### mv
 ```mv {dst:t} <src:t>```
@@ -204,7 +206,7 @@ Update the screen
 ### alloc
 ```alloc {dst:w64} <n:t>```
 
-Allocate ```n``` bytes of memory and write the address of the first bit to ```dst```
+Allocate ```n``` bytes of memory and write the address of the first byte to ```dst```
 
 ### free
 ```free <src:w64>```
